@@ -32,7 +32,8 @@ $result = $conn->query($sql);
     </audio>
 
     <hr>
-<?php } ?>
+<?php }
+?>
 
 </body>
 </html>

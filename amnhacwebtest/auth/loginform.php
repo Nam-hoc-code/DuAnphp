@@ -6,7 +6,7 @@
 <body>
     <h2>Đăng nhập</h2>
 
-    <form method="post" action="login_process.php">
+    <form method="post" action="loginprocess.php">
         <label>Username:</label><br>
         <input type="text" name="username" required><br><br>
 
@@ -14,6 +14,7 @@
         <input type="password" name="password" required><br><br>
 
         <button type="submit">Đăng nhập</button>
+    
     </form>
 </body>
 </html>
