@@ -95,6 +95,11 @@
         </div>
         <h1>CHÀO MỪNG ĐÃ QUAY</h1>
         <h2>TRỞ LẠI</h2>
+    <h2>Đăng nhập</h2>
+
+    <form method="post" action="loginprocess.php">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br><br>
 
         <form class="login" method="post" action="loginprocess.php">
             <div class="field-wrap">
@@ -112,5 +117,8 @@
             </div>
         </form>
     </div>
+        <button type="submit">Đăng nhập</button>
+    
+    </form>
 </body>
 </html>
