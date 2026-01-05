@@ -65,11 +65,11 @@
             background:var(--input-bg);
             border:1px solid rgba(255,255,255,0.08);
             border-radius:10px;
-            padding:10px 14px;
+            padding:6px 8px;
             color:var(--text);
             box-shadow:inset 0 2px 0 rgba(255,255,255,0.02);
             outline:none;
-            font-size:15px;
+            font-size:16px;
         }
         .centered{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:4px}
         .btn-confirm{background:var(--cyan);color:var(--accent-dark);border-radius:18px;padding:14px 48px;border:0;font-weight:800;cursor:pointer;font-size:18px;box-shadow:0 8px 20px rgba(0,0,0,0.6)}
@@ -115,7 +115,7 @@
             </div>
 
             <div class="centered">
-                <button class="btn-confirm" type="submit">Xác nhận</button>
+                <button class="btn-confirm" type="submit">Đăng nhập</button>
                 <div class="hint">Bạn chưa có tài khoản? <a href="../register.php">Đăng ký</a></div>
             </div>
         </form>
