@@ -13,12 +13,12 @@ $sql = "SELECT * FROM users WHERE username = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
-    
+
 $result = $stmt->get_result();
 
 if ($result->num_rows === 1) {
     $user = $result->fetch_assoc();
-                                                                 
+                                 
     // So sánh mật khẩu (đang dùng plain text)
     if ($password === $user['password']) {
     
@@ -27,15 +27,15 @@ if ($result->num_rows === 1) {
         $_SESSION['role'] = $user['role'];
 
         if ($user['role'] === 'ADMIN') {
-            header("Location: ../admin.php");
+            header("Location: ../homepage/admin.php");
         } else {
-            header("Location: ../user.php");
+            header("Location: ../homepage/user.php");
         }
         exit;
 
     } else {
-        echo "❌ Sai mật khẩu";
+        echo "Sai mật khẩu !";
     }
 } else {
-    echo "❌ Username không tồn tại";
+    echo "Username không tồn tại !";
 }

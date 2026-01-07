@@ -116,7 +116,7 @@
 
             <div class="centered">
                 <button class="btn-confirm" type="submit">Xác nhận</button>
-                <div class="hint">Bạn chưa có tài khoản? <a href="../register.php">Đăng ký</a></div>
+                <div class="hint">Bạn chưa có tài khoản? <a href="../auth/register.php">Đăng ký</a></div>
             </div>
         </form>
     </div>
