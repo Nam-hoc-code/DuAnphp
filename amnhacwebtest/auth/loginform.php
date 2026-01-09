@@ -115,8 +115,13 @@
             </div>
 
             <div class="centered">
+<<<<<<< HEAD
                 <button class="btn-confirm" type="submit">Đăng nhập</button>
                 <div class="hint">Bạn chưa có tài khoản? <a href="../register.php">Đăng ký</a></div>
+=======
+                <button class="btn-confirm" type="submit">Xác nhận</button>
+                <div class="hint">Bạn chưa có tài khoản? <a href="../auth/register.php">Đăng ký</a></div>
+>>>>>>> 2bf6c61140f2e5cd622de360cf6dc3e5eb940804
             </div>
         </form>
     </div>
