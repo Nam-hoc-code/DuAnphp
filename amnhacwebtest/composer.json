@@ -1,0 +1,12 @@
+{
+    "name": "lenovo/amnhacwebtest",
+    "authors": [
+        {
+            "name": "Nam",
+            "email": "leamle799@gmail.com"
+        }
+    ],
+    "require": {
+        "cloudinary/cloudinary_php": "^3.1"
+    }
+}
