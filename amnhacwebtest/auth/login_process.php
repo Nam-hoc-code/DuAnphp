@@ -18,20 +18,20 @@ $result = $stmt->get_result();
 if ($result->num_rows === 1) {
     $user = $result->fetch_assoc();
 
-    // So sánh mật khẩu (CHUẨN)
-    if (password_verify($password, $user['password'])) {
+    // 
+    if (password_verify($password,$user['password'])) {
 
         $_SESSION['user'] = [
-            'id' => $user['user_id'],
+            'id'       => $user['user_id'],
             'username' => $user['username'],
-            'role' => $user['role']
+            'role'     => $user['role']
         ];
 
-        // Redirect theo role
+        // ✅ REDIRECT DÙNG RELATIVE PATH (KHÔNG 404)
         if ($user['role'] === 'ADMIN') {
-            header("Location: ../admin/dashboard.php");
+            header("Location: ../admin/admin_view.php");
         } elseif ($user['role'] === 'ARTIST') {
-            header("Location: ../artist/dashboard.php");
+            header("Location: ../artist/artist_view.php");
         } else {
             header("Location: ../user/home.php");
         }

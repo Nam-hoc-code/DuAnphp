@@ -104,7 +104,7 @@
         <div class="title-big">CHÀO MỪNG ĐÃ QUAY</div>
         <div class="title-sub">TRỞ LẠI</div>
 
-        <form class="login" method="post" action="loginprocess.php">
+        <form class="login" method="post" action="login_process.php">
             <div class="field-wrap">
                 <label class="field">Tên tài Khoản</label>
                 <input type="text" name="username" required autocomplete="username">

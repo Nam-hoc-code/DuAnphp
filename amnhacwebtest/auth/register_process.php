@@ -34,7 +34,7 @@ $insertStmt = $conn->prepare($insertSql);
 $insertStmt->bind_param("sss", $username, $phone, $hashedPassword);
 
 if ($insertStmt->execute()) {
-    header("Location: loginform.php");
+    header("Location: login_form.php");
     exit;
 } else {
     echo " Đăng ký thất bại";

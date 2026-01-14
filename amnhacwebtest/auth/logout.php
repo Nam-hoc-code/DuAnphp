@@ -6,5 +6,5 @@ $_SESSION = [];
 session_destroy();
 
 /* Quay về trang login */
-header("Location: loginform.php");
+header("Location: login_form.php");
 exit;

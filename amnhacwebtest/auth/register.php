@@ -8,7 +8,7 @@
 
 <h2>Đăng ký tài khoản</h2>
 
-<form action="registerprocess.php" method="POST">
+<form action="register_process.php" method="POST">
     <label>Tên tài khoản</label><br>
     <input type="text" name="username" required><br><br>
 
@@ -21,7 +21,7 @@
     <button type="submit">Đăng ký</button>
 </form>
 
-<a href="loginform.php">Quay lại đăng nhập</a>
+<a href="login_form.php">Quay lại đăng nhập</a>
 
 </body>
 </html>
