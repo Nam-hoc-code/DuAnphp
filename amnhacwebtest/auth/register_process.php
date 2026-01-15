@@ -4,10 +4,16 @@ require_once "../config/database.php";
 $username = trim($_POST['username'] ?? '');
 $phone    = trim($_POST['phone'] ?? '');
 $password = $_POST['password'] ?? '';
+$confirm_password = $_POST['confirm_password'] ?? '';
 
-if ($username === '' || $password === '') {
+if ($username === '' || $password === '' || $confirm_password === '') {
     die(" Vui lòng nhập đầy đủ thông tin");
 }
+
+if ($password !== $confirm_password) {
+    die(" Mật khẩu xác nhận không khớp");
+}
+
 
 $db = new Database();
 $conn = $db->connect();
