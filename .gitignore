@@ -1,5 +1,5 @@
-/vendor/
-/composer.phar
-/uploads/
+/amnhacwebtest/vendor/
+/amnhacwebtest/uploads/
+/amnhacwebtest/composer.phar
 /baitap_php/
 /.env
