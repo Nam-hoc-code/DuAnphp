@@ -1,4 +1,8 @@
-<?php require_once "dash_board.php"; ?>
+
+<?php
+require_once __DIR__ . "/check_artist.php";
+require_once __DIR__ . "/../config/database.php"; 
+require_once "dash_board.php"; ?>
 
 <h2>🎤 DASHBOARD NGHỆ SĨ</h2>
 

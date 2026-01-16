@@ -5,7 +5,7 @@ require_once "../config/database.php";
 $db = new Database();
 $conn = $db->connect();
 
-$artist_id = $_SESSION['user_id'];
+$artist_id = $_SESSION['user']['id'];
 
 $sql = "SELECT * FROM songs 
         WHERE artist_id = ? AND is_deleted = 0
@@ -54,4 +54,4 @@ $result = $stmt->get_result();
 <?php endwhile; ?>
 </table>
 
-<a href="dash_board.php">⬅ Dashboard</a>
+<a href="artist_view.php">⬅ Dashboard</a>

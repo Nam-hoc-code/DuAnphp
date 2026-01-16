@@ -3,6 +3,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ARTIST') {
-    die("Access denied");
+if (
+    !isset($_SESSION['user']) ||
+    !isset($_SESSION['user']['role']) ||
+    $_SESSION['user']['role'] !== 'ARTIST'
+) {
+    header("Location: ../auth/login.php");
+    exit;
 }
+?>

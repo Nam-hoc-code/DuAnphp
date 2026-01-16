@@ -16,4 +16,4 @@
     <button type="submit">Upload</button>
 </form>
 
-<a href="dash_board.php">⬅ Quay lại dashboard</a>
+<a href="artist_view.php">⬅ Quay lại dashboard</a>

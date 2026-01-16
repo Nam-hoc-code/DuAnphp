@@ -1,9 +1,13 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (
     !isset($_SESSION['user']) ||
+    !isset($_SESSION['user']['role']) ||
     $_SESSION['user']['role'] !== 'ADMIN'
 ) {
-    die("Access denied");
+    header("Location: ../auth/login.php");
+    exit;
 }

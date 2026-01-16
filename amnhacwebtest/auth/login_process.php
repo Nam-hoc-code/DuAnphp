@@ -1,8 +1,11 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once "../config/database.php";
 
-$username = $_POST['username'] ?? '';
+$username = trim($_POST['username'] ?? '');
 $password = $_POST['password'] ?? '';
 
 $db = new Database();
@@ -10,16 +13,20 @@ $conn = $db->connect();
 
 $sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
 $stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die("SQL prepare failed");
+}
+
 $stmt->bind_param("s", $username);
 $stmt->execute();
-
 $result = $stmt->get_result();
 
 if ($result->num_rows === 1) {
     $user = $result->fetch_assoc();
 
-    // 
-    if (password_verify($password,$user['password'])) {
+    if (password_verify($password, $user['password'])) {
+
+        session_regenerate_id(true);
 
         $_SESSION['user'] = [
             'id'       => $user['user_id'],
@@ -27,7 +34,6 @@ if ($result->num_rows === 1) {
             'role'     => $user['role']
         ];
 
-        // ✅ REDIRECT DÙNG RELATIVE PATH (KHÔNG 404)
         if ($user['role'] === 'ADMIN') {
             header("Location: ../admin/admin_view.php");
         } elseif ($user['role'] === 'ARTIST') {
