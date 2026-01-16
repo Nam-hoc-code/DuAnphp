@@ -1,0 +1,5 @@
+/vendor/
+/composer.phar
+/uploads/
+/baitap_php/
+/.env
