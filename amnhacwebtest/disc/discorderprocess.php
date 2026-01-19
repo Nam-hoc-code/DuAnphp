@@ -1,37 +1,29 @@
 <?php
-session_start();
-require_once "../config/database.php";
+require_once '../config/db.php';
+require_once '../auth_check.php';
 
-if (!isset($_SESSION['user_id'])) {
-    die("Bạn chưa đăng nhập");
+if (!isset($_POST['disc_id'])) {
+    die('Dữ liệu không hợp lệ');
 }
 
+$disc_id = (int)$_POST['disc_id'];
 $user_id = $_SESSION['user_id'];
-$disc_id = $_POST['disc_id'];
 
-$db = new Database();
-$conn = $db->connect();
+/* Kiểm tra disc có tồn tại không */
+$check = $conn->prepare("SELECT disc_id FROM disc WHERE disc_id = ?");
+$check->execute([$disc_id]);
 
-/* Kiểm tra đĩa tồn tại */
-$check = $conn->prepare("
-    SELECT d.disc_id
-    FROM disc d
-    WHERE d.disc_id = ?
-");
-$check->bind_param("i", $disc_id);
-$check->execute();
-$result = $check->get_result();
-
-if ($result->num_rows === 0) {
-    die("Đĩa không tồn tại");
+if ($check->rowCount() === 0) {
+    die('Đĩa không tồn tại');
 }
 
-/* Tạo đơn hàng */
-$insert = $conn->prepare("
+/* Lưu đơn hàng */
+$sql = "
     INSERT INTO disc_orders (disc_id, user_id, created_at)
     VALUES (?, ?, NOW())
-");
-$insert->bind_param("ii", $disc_id, $user_id);
-$insert->execute();
+";
+$stmt = $conn->prepare($sql);
+$stmt->execute([$disc_id, $user_id]);
 
-echo "✅ Đặt mua thành công";
+header("Location: disclist.php?success=1");
+exit;

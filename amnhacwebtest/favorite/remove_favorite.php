@@ -1,25 +1,21 @@
 <?php
-session_start();
-require_once "../config/database.php";
+require_once '../config/database.php';
+require_once '../check_login.php';
 
-if (!isset($_SESSION['user'])) {
-    die("Access denied");
+if (!isset($_POST['fav_id'])) {
+    die('Thiếu fav_id');
 }
 
-$userId = $_SESSION['user']['id'];
-$songId = $_GET['song_id'] ?? null;
+$fav_id  = (int)$_POST['fav_id'];
+$user_id = $_SESSION['user_id'];
 
-if (!$songId) {
-    die("Thiếu song_id");
-}
-
-$db = new Database();
-$conn = $db->connect();
-
-$sql = "DELETE FROM favorites WHERE user_id = ? AND song_id = ?";
+/* Chỉ cho xóa favorite của chính mình */
+$sql = "
+    DELETE FROM favorites
+    WHERE fav_id = ? AND user_id = ?
+";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ii", $userId, $songId);
-$stmt->execute();
+$stmt->execute([$fav_id, $user_id]);
 
 header("Location: favorite_list.php");
 exit;

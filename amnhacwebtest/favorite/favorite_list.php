@@ -1,44 +1,48 @@
 <?php
-session_start();
-require_once "../config/database.php";
+require_once '../config/database.php';
+require_once '../check_login.php';
 
-if (!isset($_SESSION['user'])) {
-    die("Access denied");
-}
-
-$userId = $_SESSION['user']['id'];
-
-$db = new Database();
-$conn = $db->connect();
+$user_id = $_SESSION['user_id'];
 
 $sql = "
-    SELECT f.fav_id, s.song_id, s.title, s.artist_name
+    SELECT 
+        f.fav_id,
+        s.song_id,
+        s.title,
+        s.artist
     FROM favorites f
     JOIN songs s ON f.song_id = s.song_id
     WHERE f.user_id = ?
     ORDER BY f.created_at DESC
 ";
-
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt->execute([$user_id]);
+$favorites = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<h2>❤️ Bài hát yêu thích</h2>
+<h2>Bài hát yêu thích</h2>
 
-<?php if ($result->num_rows === 0): ?>
-    <p>Chưa có bài hát nào được yêu thích.</p>
+<?php if (empty($favorites)): ?>
+    <p>Bạn chưa có bài hát yêu thích nào.</p>
 <?php else: ?>
-    <ul>
-        <?php while ($row = $result->fetch_assoc()): ?>
-            <li>
-                🎵 <?= htmlspecialchars($row['title']) ?> - <?= htmlspecialchars($row['artist_name']) ?>
-                |
-                <a href="remove_favorite.php?song_id=<?= $row['song_id'] ?>">
-                    ❌ Bỏ yêu thích
-                </a>
-            </li>
-        <?php endwhile; ?>
-    </ul>
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Bài hát</th>
+        <th>Nghệ sĩ</th>
+        <th></th>
+    </tr>
+
+    <?php foreach ($favorites as $fav): ?>
+    <tr>
+        <td><?= htmlspecialchars($fav['title']) ?></td>
+        <td><?= htmlspecialchars($fav['artist']) ?></td>
+        <td>
+            <form action="remove_favorite.php" method="POST" style="display:inline;">
+                <input type="hidden" name="fav_id" value="<?= $fav['fav_id'] ?>">
+                <button type="submit">❌ Xóa</button>
+            </form>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</table>
 <?php endif; ?>
