@@ -5,7 +5,7 @@ $cloudinary = require "../config/cloudinary.php";
 use Cloudinary\Api\Upload\UploadApi;
 
 $title = $_POST['title'];
-$artist_id = $_SESSION['user_id'];
+$artist_id = $_SESSION['user']['id'];
 
 if (!isset($_FILES['audio']) || !isset($_FILES['cover'])) { die("Thiếu file"); }
 

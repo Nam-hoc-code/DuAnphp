@@ -2,17 +2,22 @@
 require_once "check_artist.php";
 require_once "../config/database.php";
 
+if (!isset($_SESSION['user']['id'])) {
+    die("Chưa đăng nhập");
+}
+
 if (!isset($_GET['id'])) {
     die("Thiếu ID bài hát");
 }
 
 $song_id   = (int) $_GET['id'];
-$artist_id = $_SESSION['user_id'];
+$artist_id = (int) $_SESSION['user']['id'];
+$admin_id  = 1; // admin duy nhất
 
 $db = new Database();
 $conn = $db->connect();
 
-/*  Kiểm tra bài hát có tồn tại & thuộc về nghệ sĩ */
+/* Kiểm tra bài hát có tồn tại & thuộc về nghệ sĩ */
 $sql = "SELECT status FROM songs 
         WHERE song_id = ? 
         AND artist_id = ? 
@@ -29,20 +34,21 @@ if ($result->num_rows !== 1) {
 
 $song = $result->fetch_assoc();
 
-/*  Chỉ cho gửi khi đang PENDING */
+/* Chỉ cho gửi khi đang PENDING */
 if ($song['status'] !== 'PENDING') {
     die("Bài hát không ở trạng thái chờ duyệt");
 }
 
-/*  (OPTIONAL) Tạo notification cho admin */
-$sql = "INSERT INTO notifications (user_id, message, created_at)
-        VALUES (NULL, ?, NOW())";
+/* Tạo notification cho admin */
+$sql = "INSERT INTO notifications (user_id, content, is_read, created_at)
+        VALUES (?, ?, 0, NOW())";
 
-$message = "Nghệ sĩ #$artist_id gửi yêu cầu duyệt bài hát ID #$song_id";
+$content = "Nghệ sĩ #$artist_id gửi yêu cầu duyệt bài hát ID #$song_id";
+
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $message);
+$stmt->bind_param("is", $admin_id, $content);
 $stmt->execute();
 
-/*  Quay về danh sách */
+/* Quay về danh sách */
 header("Location: my_songs.php");
 exit;

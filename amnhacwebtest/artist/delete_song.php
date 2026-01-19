@@ -7,7 +7,7 @@ use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Api\Upload\UploadApi;
 
 $song_id = $_GET['id'];
-$artist_id = $_SESSION['user_id'];
+$artist_id = $_SESSION['user']['id'];
 
 $db = new Database();
 $conn = $db->connect();

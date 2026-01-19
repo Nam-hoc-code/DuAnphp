@@ -3,7 +3,7 @@ require_once "check_admin.php";
 require_once "../config/database.php";
 
 $song_id = $_GET['id'];
-$admin_id = $_SESSION['user_id'];
+$admin_id = $_SESSION['user']['id'];
 
 $db = new Database();
 $conn = $db->connect();

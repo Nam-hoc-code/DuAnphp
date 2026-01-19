@@ -1,9 +1,9 @@
 <?php
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . '/../vendor/autoload.php';
 
-use Cloudinary\Cloudinary;
+use Cloudinary\Configuration\Configuration;
 
-$cloudinary = new Cloudinary([
+Configuration::instance([
     'cloud' => [
         'cloud_name' => 'devetmefh',
         'api_key'    => '592532872642166',
@@ -13,5 +13,4 @@ $cloudinary = new Cloudinary([
         'secure' => true
     ]
 ]);
-
-return $cloudinary;
+    

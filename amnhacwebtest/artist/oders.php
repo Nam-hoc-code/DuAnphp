@@ -1,12 +1,12 @@
 <?php
-session_start();
+require_once "check_artist.php";
 require_once "../config/database.php";
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ARTIST') {
-    die("Access denied");
+if (!isset($_SESSION['user']['id'])) {
+    die("Chưa đăng nhập");
 }
 
-$artist_id = $_SESSION['user_id'];
+$artist_id = (int) $_SESSION['user']['id'];
 
 $db = new Database();
 $conn = $db->connect();
@@ -22,7 +22,7 @@ SELECT
     d.price,
     o.created_at
 FROM disc_orders o
-JOIN disc d ON o.disc_id = d.disc_id
+JOIN discs d ON o.disc_id = d.disc_id
 JOIN songs s ON d.song_id = s.song_id
 JOIN users u ON o.user_id = u.user_id
 WHERE s.artist_id = ?
