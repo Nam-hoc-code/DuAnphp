@@ -201,7 +201,7 @@
                 <input type="password" id="confirm_password" name="confirm_password" required>
             </div>
 
-            <button type="submit" class="btn-submit">Đăng Nhập</button>
+            <button type="submit" class="btn-submit">Đăng Ký</button>
         </form>
 
         <div class="footer-links">
