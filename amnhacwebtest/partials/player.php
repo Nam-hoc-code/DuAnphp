@@ -1,5 +1,9 @@
 <?php
-$songUrl = $_GET['song_url'] ?? null;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$currentSong = $_SESSION['current_song'] ?? null;
 ?>
 
 <div style="
@@ -11,10 +15,14 @@ $songUrl = $_GET['song_url'] ?? null;
     color:#fff;
     padding:10px;
 ">
-    <?php if ($songUrl): ?>
-        <audio controls autoplay style="width:100%;">
-            <source src="<?= htmlspecialchars($songUrl) ?>" type="audio/mpeg">
-            Trình duyệt không hỗ trợ audio.
+    <?php if ($currentSong): ?>
+        <p>
+            🎵 <b><?= htmlspecialchars($currentSong['title']) ?></b>
+            – <?= htmlspecialchars($currentSong['artist_name']) ?>
+        </p>
+
+        <audio controls autoplay style="width:100%">
+            <source src="<?= htmlspecialchars($currentSong['cloud_url']) ?>" type="audio/mpeg">
         </audio>
     <?php else: ?>
         <p style="text-align:center;">🎧 Chọn bài hát để phát</p>
