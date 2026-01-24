@@ -8,12 +8,13 @@ if (session_status() === PHP_SESSION_NONE) {
     <h2 style="display:inline;">🎵 Music Platform</h2>
 
     <div style="float:right;">
-        <?php if (isset($_SESSION['user_id'])): ?>
-            Xin chào, <b><?= $_SESSION['username'] ?? 'User' ?></b>
-            | <a href="/logout.php" style="color:#0f0;">Đăng xuất</a>
+        <?php if (isset($_SESSION['user'])): ?>
+            Xin chào, <b><?= htmlspecialchars($_SESSION['user']['username']) ?></b>
+            | <a href="../auth/logout.php" style="color:#0f0;">Đăng xuất</a>
         <?php else: ?>
-            <a href="/login.php" style="color:#0f0;">Đăng nhập</a>
+            <a href="../auth/login_form.php" style="color:#0f0;">Đăng nhập</a>
         <?php endif; ?>
     </div>
+            
     <div style="clear:both;"></div>
 </header>

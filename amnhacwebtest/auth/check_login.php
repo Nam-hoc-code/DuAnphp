@@ -4,6 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['user'])) {
-    header("Location: ../auth/loginform.php");
+    header("Location: ../auth/login_form.php");
     exit;
 }

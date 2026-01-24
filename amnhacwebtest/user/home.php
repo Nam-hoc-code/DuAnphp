@@ -1,111 +1,98 @@
 <?php
-/*********************************
- * AUTH
- *********************************/
-require_once '../auth_check.php';
-
-/*********************************
- * BACKEND LOGIC
- * (Controller nhẹ cho trang home)
- *********************************/
+require_once '../auth/check_login.php';
+require_once '../partials/header.php';
+require_once '../partials/sidebar.php';
 require_once 'homeprocess.php';
 
-/* XỬ LÝ PHÁT NHẠC */
-$playSong = null;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 if (isset($_GET['song_id'])) {
     foreach ($songList as $song) {
         if ($song['song_id'] == $_GET['song_id']) {
-            $playSong = $song;
+            $_SESSION['current_song'] = $song;
             break;
         }
     }
 }
+
+/* Ảnh mặc định khi thiếu cover */
+$defaultCover = '../assets/images/default-cover.png';
 ?>
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Home - Music Website</title>
-</head>
+<main style="display:flex; gap:20px; padding-bottom:80px">
 
-<body>
+<!-- ===== DANH SÁCH BÀI HÁT ===== -->
+<aside style="width:25%">
+    <h3>Danh sách bài hát</h3>
 
-<!-- ===================================== -->
-<!-- TOP BAR (Frontend phụ trách giao diện) -->
-<!-- ===================================== -->
-<header>
+    <?php foreach ($songList as $song): ?>
+        <?php
+            $cover = (!empty($song['cover_image']))
+                ? $song['cover_image']
+                : $defaultCover;
+        ?>
 
-    <!-- LOGO -->
-    <div>
-        <!-- LOGO UI -->
-    </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
 
-    <!-- SEARCH -->
-    <form method="GET" action="searchprocess.php">
-        <input type="text" name="keyword" placeholder="Tìm kiếm bài hát">
-    </form>
+            <!-- Ảnh bài hát -->
+            <img
+                src="<?= htmlspecialchars($cover) ?>"
+                alt="cover"
+                style="width:45px;height:45px;object-fit:cover;border-radius:6px"
+            >
 
-    <!-- USER INFO -->
-    <div>
-        Xin chào, <?= $_SESSION['user']['username'] ?>
-        <a href="../../auth/logout.php">Đăng xuất</a>
-    </div>
-
-</header>
-
-<!-- ===================================== -->
-<!-- MAIN CONTENT -->
-<!-- ===================================== -->
-<main>
-
-    <!-- ========== SIDEBAR ========== -->
-    <aside>
-        <h3>Danh sách bài hát</h3>
-
-        <?php foreach ($songList as $song): ?>
-            <div>
+            <div style="flex:1">
                 <a href="home.php?song_id=<?= $song['song_id'] ?>">
-                    ▶ <?= $song['title'] ?>
+                    ▶ <?= htmlspecialchars($song['title']) ?>
                 </a>
             </div>
-        <?php endforeach; ?>
-    </aside>
 
-    <!-- ========== CONTENT ========== -->
-    <section>
+            <!-- ❤️ FAVORITE -->
+            <form action="../favorite/add_favorite.php" method="POST" style="margin:0">
+                <input type="hidden" name="song_id" value="<?= $song['song_id'] ?>">
+                <button type="submit"
+                    style="border:none;background:none;cursor:pointer;font-size:16px">
+                    ❤️
+                </button>
+            </form>
+        </div>
+    <?php endforeach; ?>
+</aside>
 
-        <!-- MUSIC PLAYER -->
-        <?php if ($playSong): ?>
-            <h2>Đang phát</h2>
-            <p>
-                🎵 <b><?= $playSong['title'] ?></b> – <?= $playSong['artist'] ?>
-            </p>
+<!-- ===== NỘI DUNG CHÍNH ===== -->
+<section style="width:75%">
+    <h2>Bài hát thịnh hành</h2>
 
-            <audio controls autoplay>
-                <source src="../../<?= $playSong['file_path'] ?>" type="audio/mpeg">
-            </audio>
-            <hr>
-        <?php else: ?>
-            <p>🎧 Chọn bài hát để phát</p>
-            <hr>
-        <?php endif; ?>
+    <?php foreach ($trendingSongs as $song): ?>
+        <?php
+            $cover = (!empty($song['cover_image']))
+                ? $song['cover_image']
+                : $defaultCover;
+        ?>
 
-        <!-- TRENDING -->
-        <h2>Những bài hát thịnh hành</h2>
-        <?php foreach ($trendingSongs as $song): ?>
-            <div><?= $song['title'] ?> - <?= $song['artist'] ?></div>
-        <?php endforeach; ?>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px">
 
-        <!-- ARTISTS -->
-        <h2>Nghệ sĩ phổ biến</h2>
-        <?php foreach ($popularArtists as $artist): ?>
-            <div><?= $artist['artist'] ?></div>
-        <?php endforeach; ?>
+            <img
+                src="<?= htmlspecialchars($cover) ?>"
+                alt="cover"
+                style="width:60px;height:60px;object-fit:cover;border-radius:8px"
+            >
 
-    </section>
+            <div>
+                <strong><?= htmlspecialchars($song['title']) ?></strong><br>
+                <small><?= htmlspecialchars($song['artist_name']) ?></small>
+            </div>
+        </div>
+    <?php endforeach; ?>
+
+    <h2>Nghệ sĩ phổ biến</h2>
+    <?php foreach ($popularArtists as $artist): ?>
+        <div><?= htmlspecialchars($artist['username']) ?></div>
+    <?php endforeach; ?>
+</section>
 
 </main>
 
-</body>
-</html>
+<?php require_once '../partials/player.php'; ?>

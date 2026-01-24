@@ -212,6 +212,12 @@ require_once "dash_board.php";
                 <i class="fas fa-music"></i>
                 <span>Duyệt bài hát</span>
             </a>
+        </li>        
+        <li class="nav-item">
+            <a href="../event/add_event.php" class="nav-link">
+                <i class="fas fa-music"></i>
+                <span>Thêm sự kiện</span>
+            </a>
         </li>
         <li class="nav-item">
             <a href="../auth/logout.php" class="nav-link logout-btn">
