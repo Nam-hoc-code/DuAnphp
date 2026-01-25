@@ -306,7 +306,7 @@ $role = strtoupper($_SESSION['user']['role'] ?? 'USER');
 
 </body>
 </html>
-
+<!-- 
 <h2 class="event-title">🎵 Sự kiện âm nhạc</h2>
 
 <?php foreach ($events as $event): ?>
@@ -355,4 +355,4 @@ $role = strtoupper($_SESSION['user']['role'] ?? 'USER');
         </div>
 
     </div>
-<?php endforeach; ?>
+<?php endforeach; ?> -->

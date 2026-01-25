@@ -338,7 +338,7 @@ if (($_SESSION['user']['role'] ?? '') !== 'ADMIN') {
 </body>
 </html>
 
-<h2>➕ Thêm sự kiện mới</h2>
+<!-- <h2>➕ Thêm sự kiện mới</h2>
 
 <form action="add_event_process.php" method="POST" enctype="multipart/form-data">
 
@@ -363,4 +363,4 @@ if (($_SESSION['user']['role'] ?? '') !== 'ADMIN') {
 <hr>
 
 <h3>📋 Quản lý sự kiện</h3>
-<a href="../event/event_list.php">➡️ Xem danh sách sự kiện</a>
+<a href="../event/event_list.php">➡️ Xem danh sách sự kiện</a> -->
