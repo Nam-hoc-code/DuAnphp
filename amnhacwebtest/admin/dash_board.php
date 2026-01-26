@@ -7,6 +7,7 @@ $conn = $db->connect();
 
 $totalUsers = $conn->query(
     "SELECT COUNT(*) total FROM users"
+
 )->fetch_assoc()['total'];
 
 $totalSongs = $conn->query(
