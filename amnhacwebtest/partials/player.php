@@ -129,12 +129,12 @@ $currentSong = $_SESSION['current_song'] ?? null;
             </div>
         </div>
 
-        <div class="player-volume">
+        <!-- <div class="player-volume">
             <i class="fa-solid fa-volume-high"></i>
             <div style="width: 100px; height: 4px; background: #4d4d4d; border-radius: 2px; position: relative;">
                 <div style="width: 70%; height: 100%; background: var(--spotify-green); border-radius: 2px;"></div>
             </div>
-        </div>
+        </div> -->
     <?php else: ?>
         <div class="empty-player">
             <i class="fa-solid fa-music" style="margin-right: 10px;"></i>
