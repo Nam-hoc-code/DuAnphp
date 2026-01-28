@@ -198,11 +198,11 @@ $defaultCover = '../assets/images/default-cover.png';
         border-radius: 12px;
         margin-bottom: 40px;
         overflow: hidden;
-        /* Soft blurred bottom shadow */
+        /* bóng mờ nhẹ ở phía dưới*/
         box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
     }
 
-    /* Gradient overlay to fade the bottom of the slide content into the shadow area */
+    /* Hiệu ứng chuyển màu gradient giúp làm mờ phần dưới nội dung slide vào vùng bóng. */
     .slide::before {
         content: '';
         position: absolute;
@@ -247,7 +247,7 @@ $defaultCover = '../assets/images/default-cover.png';
         position: relative;
         z-index: 2;
         max-width: 550px;
-        /* Reverted to left align */
+        /* Đã chuyển về căn chỉnh trái. */
     }
 
     .slide-tag {
