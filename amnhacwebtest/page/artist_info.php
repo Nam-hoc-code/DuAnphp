@@ -22,9 +22,10 @@ if (!$artist) {
     die('Artist không tồn tại');
 }
 
-/* ===== LẤY BÀI HÁT ===== */
+/* ===== LẤY BÀI HÁT (ĐÚNG THEO DB) ===== */
+
 $sql = "
-    SELECT song_id, title, cover_image, cloud_url, created_at
+    SELECT song_id, title, cover_image, cloud_url
     FROM songs
     WHERE artist_id = ?
       AND status = 'APPROVED'
@@ -48,7 +49,6 @@ while ($row = $songs_result->fetch_assoc()) {
 }
 
 $defaultCover = '../assets/images/default-cover.png';
-$artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../assets/images/default-artist.png';
 ?>
 
 <style>
@@ -257,14 +257,13 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         text-align: left;
         padding-left: 20px !important;
     }
+<main style="margin-left:260px;padding:80px;color:white">
 
-    .duration-col {
-        color: var(--text-sub);
-        font-size: 14px;
-        text-align: right;
-        width: 80px;
-    }
-</style>
+    <h1><?= htmlspecialchars($artist['username']) ?></h1>
+
+    <?php if (!empty($artist['avatar'])): ?>
+        <img src="<?= htmlspecialchars('../' . $artist['avatar']) ?>" width="120">
+    <?php endif; ?>
 
 <div class="artist-page">
     <!-- Hero Header -->
@@ -351,5 +350,29 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         }
     }
 </script>
+    <p><?= count($songs) ?> bài hát</p>
 
-<?php require_once '../partials/player.php'; ?>
+    <hr>
+
+    <h2>Bài hát</h2>
+
+    <?php if (empty($songs)): ?>
+        <p>Chưa có bài hát</p>
+    <?php else: ?>
+        <ul>
+            <?php foreach ($songs as $song): ?>
+                <li style="margin-bottom:12px">
+                    <a href="song_play.php?id=<?= $song['song_id'] ?>" style="color:white">
+                        <img 
+                            src="<?= htmlspecialchars($song['cover_image'] ?: $defaultCover) ?>"
+                            width="60"
+                            style="vertical-align:middle"
+                        >
+                        <?= htmlspecialchars($song['title']) ?>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+
+</main>

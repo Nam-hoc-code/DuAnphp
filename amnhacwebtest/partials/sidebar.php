@@ -29,7 +29,7 @@ if (session_status() === PHP_SESSION_NONE) {
     .logo-container i { font-size: 28px; color: var(--spotify-green); }
     .logo-container span { font-size: 1.5rem; font-weight: 700; letter-spacing: -1px; }
 
-    .nav-group { flex-grow: 1; }
+    .nav-group { flex-grow: 1; margin-top: 20px;}
 
     .nav-link { 
         display: flex; 

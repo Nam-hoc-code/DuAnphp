@@ -4,11 +4,12 @@ require_once '../config/database.php';
 require_once '../partials/header.php';
 require_once '../partials/sidebar.php';
 
-if (!isset($_GET['id'])) {
-    die('Thiếu user id');
+/* ========= LẤY USER ID TỪ SESSION ========= */
+$userId = $_SESSION['user_id'] ?? null;
+if (!$userId) {
+    die('Chưa đăng nhập');
 }
 
-$userId = (int) $_GET['id'];
 $conn = (new Database())->connect();
 
 /* ========= USER INFO ========= */
@@ -39,13 +40,15 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $songs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+$defaultCover = '../assets/images/default-cover.png';
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Artist</title>
+    <title>Tài khoản</title>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -137,7 +140,7 @@ $songs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         <div class="song-grid">
             <?php foreach ($songs as $song): ?>
                 <div class="song-card">
-                    <img src="<?= htmlspecialchars($song['cover_image'] ?: '../assets/images/default-cover.png') ?>">
+                    <img src="<?= htmlspecialchars($song['cover_image'] ?: $defaultCover) ?>" alt="cover">
                     <div class="song-title"><?= htmlspecialchars($song['title']) ?></div>
                 </div>
             <?php endforeach; ?>

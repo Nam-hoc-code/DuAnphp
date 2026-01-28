@@ -465,18 +465,24 @@ $defaultCover = '../assets/images/default-cover.png';
 
         <div class="artist-grid">
             <?php foreach ($popularArtists as $artist): ?>
-                <?php $avatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : null; ?>
-                <div class="artist-card" onclick="window.location.href='../page/artist_info.php?id=<?= $artist['user_id'] ?>'">
-                    <?php if ($avatar): ?>
-                        <img src="<?= htmlspecialchars($avatar) ?>" class="artist-img" alt="avatar">
-                    <?php else: ?>
-                        <div class="artist-img" style="background: #282828; display: flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-user" style="font-size: 48px; color: #535353;"></i>
+                <a href="../page/artist_info.php?id=<?= $artist['user_id'] ?>" 
+                style="text-decoration:none;color:inherit;">
+                    
+                    <div class="artist-card">
+                        <div class="artist-img" 
+                            style="background:#282828;display:flex;align-items:center;justify-content:center;">
+                            <i class="fa-solid fa-user" style="font-size:48px;color:#535353;"></i>
                         </div>
-                    <?php endif; ?>
-                    <div style="font-weight: 700; margin-bottom: 4px;"><?= htmlspecialchars($artist['username']) ?></div>
-                    <div style="font-size: 13px; color: var(--text-sub);">Nghệ sĩ</div>
-                </div>
+
+                        <div style="font-weight:700;margin-bottom:4px;">
+                            <?= htmlspecialchars($artist['username']) ?>
+                        </div>
+
+                        <div style="font-size:13px;color:var(--text-sub);">
+                            Nghệ sĩ
+                        </div>
+                    </div>
+                </a>
             <?php endforeach; ?>
         </div>
    
