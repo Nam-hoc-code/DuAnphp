@@ -22,9 +22,10 @@ if (!$artist) {
     die('Artist không tồn tại');
 }
 
-/* ===== LẤY BÀI HÁT ===== */
+/* ===== LẤY BÀI HÁT (ĐÚNG THEO DB) ===== */
+
 $sql = "
-    SELECT song_id, title, cover_image, cloud_url, created_at
+    SELECT song_id, title, cover_image, cloud_url
     FROM songs
     WHERE artist_id = ?
       AND status = 'APPROVED'
@@ -37,269 +38,39 @@ $stmt->execute();
 $songs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $defaultCover = '../assets/images/default-cover.png';
-$artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../assets/images/default-artist.png';
 ?>
 
-<style>
-    .artist-page {
-        margin-left: 260px;
-        min-height: 100vh;
-        background: #121212;
-        padding-bottom: 100px;
-    }
+<main style="margin-left:260px;padding:80px;color:white">
 
-    /* Hero Header */
-    .artist-hero {
-        height: 400px;
-        position: relative;
-        display: flex;
-        align-items: flex-end;
-        padding: 0 32px 32px 32px;
-        background-size: cover;
-        background-position: center 20%;
-        color: #fff;
-    }
+    <h1><?= htmlspecialchars($artist['username']) ?></h1>
 
-    .artist-hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(transparent 0, rgba(0,0,0,0.5) 70%, rgba(18,18,18,1) 100%);
-        z-index: 1;
-    }
+    <?php if (!empty($artist['avatar'])): ?>
+        <img src="<?= htmlspecialchars('../' . $artist['avatar']) ?>" width="120">
+    <?php endif; ?>
 
-    .hero-content {
-        position: relative;
-        z-index: 2;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
+    <p><?= count($songs) ?> bài hát</p>
 
-    .verified-badge {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        font-weight: 600;
-    }
+    <hr>
 
-    .verified-badge i {
-        color: #3d91ff;
-        font-size: 24px;
-    }
+    <h2>Bài hát</h2>
 
-    .artist-name {
-        font-size: 96px;
-        font-weight: 900;
-        margin: 8px 0;
-        letter-spacing: -4px;
-        line-height: 1;
-    }
+    <?php if (empty($songs)): ?>
+        <p>Chưa có bài hát</p>
+    <?php else: ?>
+        <ul>
+            <?php foreach ($songs as $song): ?>
+                <li style="margin-bottom:12px">
+                    <a href="song_play.php?id=<?= $song['song_id'] ?>" style="color:white">
+                        <img 
+                            src="<?= htmlspecialchars($song['cover_image'] ?: $defaultCover) ?>"
+                            width="60"
+                            style="vertical-align:middle"
+                        >
+                        <?= htmlspecialchars($song['title']) ?>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
 
-    .listener-count {
-        font-size: 16px;
-        font-weight: 500;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-
-    /* Action Bar */
-    .action-bar {
-        padding: 24px 32px;
-        display: flex;
-        align-items: center;
-        gap: 32px;
-    }
-
-    .btn-play-big {
-        width: 56px;
-        height: 56px;
-        background: var(--spotify-green);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        color: #000;
-        border: none;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    .btn-play-big:hover {
-        transform: scale(1.05);
-        background: #1ed760;
-    }
-
-    .btn-follow {
-        background: transparent;
-        border: 1px solid rgba(255,255,255,0.3);
-        color: #fff;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-weight: 700;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        cursor: pointer;
-    }
-
-    .btn-follow:hover {
-        border-color: #fff;
-    }
-
-    .icon-btn {
-        background: transparent;
-        border: none;
-        color: var(--text-sub);
-        font-size: 24px;
-        cursor: pointer;
-        transition: color 0.2s;
-    }
-
-    .icon-btn:hover {
-        color: #fff;
-    }
-
-    /* Popular Section */
-    .popular-section {
-        padding: 0 32px;
-    }
-
-    .section-title {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 16px;
-    }
-
-    .song-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .song-row {
-        height: 56px;
-        transition: background 0.2s;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .song-row:hover {
-        background: rgba(255,255,255,0.1);
-    }
-
-    .song-row td {
-        padding: 0 16px;
-    }
-
-    .rank-col {
-        width: 40px;
-        color: var(--text-sub);
-        text-align: right;
-        font-size: 16px;
-    }
-
-    .title-col {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        height: 56px;
-    }
-
-    .song-thumb {
-        width: 40px;
-        height: 40px;
-        border-radius: 4px;
-        object-fit: cover;
-    }
-
-    .song-name {
-        font-weight: 500;
-        font-size: 16px;
-        color: #fff;
-    }
-
-    .play-count-col {
-        color: var(--text-sub);
-        font-size: 14px;
-        text-align: right;
-        width: 150px;
-    }
-
-    .duration-col {
-        color: var(--text-sub);
-        font-size: 14px;
-        text-align: right;
-        width: 80px;
-    }
-</style>
-
-<div class="artist-page">
-    <!-- Hero Header -->
-    <div class="artist-hero" style="background-image: url('<?= htmlspecialchars($artistAvatar) ?>');">
-        <div class="hero-content">
-            <div class="verified-badge">
-                <i class="fa-solid fa-circle-check"></i>
-                Verified Artist
-            </div>
-            <h1 class="artist-name"><?= htmlspecialchars($artist['username']) ?></h1>
-            <div class="listener-count">
-                <?= number_format(rand(500000, 2000000)) ?> monthly listeners
-            </div>
-        </div>
-    </div>
-
-    <!-- Action Bar -->
-    <div class="action-bar">
-        <button class="btn-play-big" onclick="playFirstSong()">
-            <i class="fa-solid fa-play"></i>
-        </button>
-        <button class="icon-btn">
-            <i class="fa-solid fa-shuffle"></i>
-        </button>
-        <button class="btn-follow">Follow</button>
-        <button class="icon-btn">
-            <i class="fa-solid fa-ellipsis"></i>
-        </button>
-    </div>
-
-    <!-- Popular Section -->
-    <div class="popular-section">
-        <h2 class="section-title">Popular</h2>
-        
-        <?php if (empty($songs)): ?>
-            <p style="color: var(--text-sub);">Chưa có bài hát nào được đăng tải.</p>
-        <?php else: ?>
-            <table class="song-table">
-                <tbody>
-                    <?php foreach ($songs as $index => $song): ?>
-                        <tr class="song-row" onclick="window.location.href='../user/home.php?song_id=<?= $song['song_id'] ?>'">
-                            <td class="rank-col"><?= $index + 1 ?></td>
-                            <td>
-                                <div class="title-col">
-                                    <img src="<?= htmlspecialchars($song['cover_image'] ?: $defaultCover) ?>" class="song-thumb">
-                                    <span class="song-name"><?= htmlspecialchars($song['title']) ?></span>
-                                </div>
-                            </td>
-                            <td class="play-count-col"><?= number_format(rand(1000000, 5000000)) ?></td>
-                            <td class="duration-col">3:45</td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
-    </div>
-</div>
-
-<script>
-    function playFirstSong() {
-        <?php if (!empty($songs)): ?>
-            window.location.href = '../user/home.php?song_id=<?= $songs[0]['song_id'] ?>';
-        <?php endif; ?>
-    }
-</script>
-
-<?php require_once '../partials/player.php'; ?>
+</main>
