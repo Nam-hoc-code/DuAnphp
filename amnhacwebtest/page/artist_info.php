@@ -34,7 +34,18 @@ $sql = "
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $artistId);
 $stmt->execute();
-$songs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$songs_result = $stmt->get_result();
+$songs = [];
+while ($row = $songs_result->fetch_assoc()) {
+    // Kiểm tra xem bài hát có trong danh sách yêu thích không
+    $userId = $_SESSION['user']['user_id'] ?? 0;
+    $favSql = "SELECT favorite_id FROM favorites WHERE user_id = ? AND song_id = ?";
+    $favStmt = $conn->prepare($favSql);
+    $favStmt->bind_param("ii", $userId, $row['song_id']);
+    $favStmt->execute();
+    $row['is_favorite'] = $favStmt->get_result()->num_rows > 0;
+    $songs[] = $row;
+}
 
 $defaultCover = '../assets/images/default-cover.png';
 $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../assets/images/default-artist.png';
@@ -50,11 +61,13 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
 
     /* Hero Header */
     .artist-hero {
-        height: 400px;
+        height: 45vh;
+        min-height: 340px;
+        max-height: 500px;
         position: relative;
         display: flex;
         align-items: flex-end;
-        padding: 0 32px 32px 32px;
+        padding: 0 32px 24px 32px;
         background-size: cover;
         background-position: center 20%;
         color: #fff;
@@ -67,7 +80,7 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(transparent 0, rgba(0,0,0,0.5) 70%, rgba(18,18,18,1) 100%);
+        background: linear-gradient(transparent 0, rgba(0,0,0,0.2) 50%, rgba(18,18,18,1) 100%);
         z-index: 1;
     }
 
@@ -76,31 +89,33 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         z-index: 2;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 0;
     }
 
     .verified-badge {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         font-size: 14px;
-        font-weight: 600;
+        font-weight: 500;
+        margin-bottom: 8px;
     }
 
     .verified-badge i {
         color: #3d91ff;
-        font-size: 24px;
+        font-size: 20px;
     }
 
     .artist-name {
-        font-size: 96px;
+        font-size: clamp(48px, 8vw, 96px);
         font-weight: 900;
-        margin: 8px 0;
-        letter-spacing: -4px;
+        margin: 0;
+        letter-spacing: -2px;
         line-height: 1;
     }
 
     .listener-count {
+        margin-top: 12px;
         font-size: 16px;
         font-weight: 500;
         text-shadow: 0 2px 4px rgba(0,0,0,0.5);
@@ -111,7 +126,8 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         padding: 24px 32px;
         display: flex;
         align-items: center;
-        gap: 32px;
+        gap: 24px;
+        position: relative;
     }
 
     .btn-play-big {
@@ -122,11 +138,12 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 20px;
         color: #000;
         border: none;
         cursor: pointer;
-        transition: transform 0.2s;
+        transition: transform 0.1s ease, background-color 0.2s ease;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3);
     }
 
     .btn-play-big:hover {
@@ -138,13 +155,14 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         background: transparent;
         border: 1px solid rgba(255,255,255,0.3);
         color: #fff;
-        padding: 8px 16px;
+        padding: 7px 15px;
         border-radius: 4px;
         font-weight: 700;
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 1px;
         cursor: pointer;
+        margin-left: 8px;
     }
 
     .btn-follow:hover {
@@ -155,13 +173,21 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         background: transparent;
         border: none;
         color: var(--text-sub);
-        font-size: 24px;
+        font-size: 22px;
         cursor: pointer;
-        transition: color 0.2s;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .icon-btn:hover {
         color: #fff;
+        transform: scale(1.05);
+    }
+
+    .icon-btn i.fa-solid.fa-heart {
+        color: var(--spotify-green);
     }
 
     /* Popular Section */
@@ -172,7 +198,8 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
     .section-title {
         font-size: 24px;
         font-weight: 700;
-        margin-bottom: 16px;
+        margin-bottom: 20px;
+        color: #fff;
     }
 
     .song-table {
@@ -200,6 +227,7 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         color: var(--text-sub);
         text-align: right;
         font-size: 16px;
+        font-weight: 400;
     }
 
     .title-col {
@@ -212,8 +240,9 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
     .song-thumb {
         width: 40px;
         height: 40px;
-        border-radius: 4px;
+        border-radius: 0; /* Square thumbnails like image */
         object-fit: cover;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
     .song-name {
@@ -225,8 +254,8 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
     .play-count-col {
         color: var(--text-sub);
         font-size: 14px;
-        text-align: right;
-        width: 150px;
+        text-align: left;
+        padding-left: 20px !important;
     }
 
     .duration-col {
@@ -247,7 +276,7 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
             </div>
             <h1 class="artist-name"><?= htmlspecialchars($artist['username']) ?></h1>
             <div class="listener-count">
-                <?= number_format(rand(500000, 2000000)) ?> monthly listeners
+                <?= number_format(rand(600000, 700000)) ?> monthly listeners
             </div>
         </div>
     </div>
@@ -257,10 +286,17 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         <button class="btn-play-big" onclick="playFirstSong()">
             <i class="fa-solid fa-play"></i>
         </button>
+        
+        <button class="icon-btn heart-btn" onclick="toggleArtistFavorite(this)">
+            <i class="fa-regular fa-heart"></i>
+        </button>
+
         <button class="icon-btn">
             <i class="fa-solid fa-shuffle"></i>
         </button>
+        
         <button class="btn-follow">Follow</button>
+        
         <button class="icon-btn">
             <i class="fa-solid fa-ellipsis"></i>
         </button>
@@ -284,8 +320,8 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
                                     <span class="song-name"><?= htmlspecialchars($song['title']) ?></span>
                                 </div>
                             </td>
-                            <td class="play-count-col"><?= number_format(rand(1000000, 5000000)) ?></td>
-                            <td class="duration-col">3:45</td>
+                            <td class="play-count-col"><?= number_format(rand(1000000, 2000000)) ?></td>
+                            <td class="duration-col"><?= rand(3, 4) ?>:<?= str_pad(rand(0, 59), 2, '0', STR_PAD_LEFT) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -299,6 +335,20 @@ $artistAvatar = (!empty($artist['avatar'])) ? '../' . $artist['avatar'] : '../as
         <?php if (!empty($songs)): ?>
             window.location.href = '../user/home.php?song_id=<?= $songs[0]['song_id'] ?>';
         <?php endif; ?>
+    }
+
+    function toggleArtistFavorite(btn) {
+        const icon = btn.querySelector('i');
+        if (icon.classList.contains('fa-regular')) {
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
+            icon.classList.add('fa-heart');
+        } else {
+            icon.classList.remove('fa-solid');
+            icon.classList.remove('fa-heart');
+            icon.classList.add('fa-regular');
+            icon.classList.add('fa-heart');
+        }
     }
 </script>
 
