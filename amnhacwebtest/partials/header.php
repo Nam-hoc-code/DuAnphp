@@ -236,14 +236,7 @@ $keyword = $_GET['q'] ?? '';
 
 <div class="app-container">
     <header class="top-nav">
-        <div class="nav-center">
-            <div class="search-container">
-                <form action="../services/search.php" method="GET">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" name="query" class="search-input" placeholder="Bạn muốn phát nội dung gì?">
-                </form>
-            </div>
-        </div>
+
         <div>
         <!-- thanh search nha -->   
         <form method="GET" action="../services/search.php" class="search-form">
