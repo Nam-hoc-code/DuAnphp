@@ -95,7 +95,7 @@ if (isset($_GET['q']) && trim($_GET['q']) !== '') {
 </style>
 
 <main class="search-content">
-    <div class="search-box-container">
+     <!-- <div class="search-box-container">
         <form method="GET" action="search.php" class="search-form">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="text"
@@ -105,7 +105,7 @@ if (isset($_GET['q']) && trim($_GET['q']) !== '') {
                    value="<?= htmlspecialchars($keyword) ?>"
                    required>
         </form>
-    </div>
+    </div>  -->
 
     <div class="result-section">
         <?php if (!empty($keyword)): ?>

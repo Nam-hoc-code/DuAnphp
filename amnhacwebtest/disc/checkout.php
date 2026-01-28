@@ -1,6 +1,6 @@
 <?php
 require_once "../config/database.php";
-require_once "../auth/check_login.php";
+// require_once "../auth/check_login.php";
 
 if (empty($_SESSION['cart'])) {
     header("Location: cart.php");

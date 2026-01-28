@@ -1,12 +1,13 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once '../auth/check_login.php';
 require_once '../partials/header.php';
 require_once '../partials/sidebar.php';
 require_once 'homeprocess.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+
 
 if (isset($_GET['song_id'])) {
     foreach ($songList as $song) {
@@ -235,32 +236,46 @@ $defaultCover = '../assets/images/default-cover.png';
                 <img src="<?= htmlspecialchars($cover) ?>" alt="cover">
                 <div style="flex: 1;">
                     <div style="font-weight: 600;"><?= htmlspecialchars($song['title']) ?></div>
-                    <div style="font-size: 13px; color: var(--text-sub);"><?= htmlspecialchars($song['artist_name']) ?></div>
+                    <div style="font-size: 13px; color: var(--text-sub);">
+                        <?= htmlspecialchars($song['artist_name']) ?>
+                    </div>
                 </div>
                 <div style="color: var(--text-sub); font-size: 13px; margin: 0 20px;">
                     <i class="fa-solid fa-chart-line" style="margin-right: 8px;"></i> Trending
                 </div>
                 <button onclick="window.location.href='home.php?song_id=<?= $song['song_id'] ?>'" 
-                        style="background:none; border:none; color: #fff; cursor:pointer; font-size: 18px;">
+                        style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;">
                     <i class="fa-solid fa-play"></i>
                 </button>
             </div>
         <?php endforeach; ?>
     </div>
 
-    <h2 class="section-title" style="margin-top: 48px;">Nghệ sĩ phổ biến</h2>
-    <div class="artist-grid">
-        <?php foreach ($popularArtists as $artist): ?>
-            <div class="artist-card">
-                <div class="artist-img" style="background: #282828; display: flex; align-items: center; justify-content: center;">
-                    <i class="fa-solid fa-user" style="font-size: 48px; color: #535353;"></i>
-                </div>
-                <div style="font-weight: 700; margin-bottom: 4px;"><?= htmlspecialchars($artist['username']) ?></div>
-                <div style="font-size: 13px; color: var(--text-sub);">Nghệ sĩ</div>
-            </div>
-        <?php endforeach; ?>
-    </div>
+        <h2 class="section-title" style="margin-top: 48px;">Nghệ sĩ phổ biến</h2> 
 
+        <div class="artist-grid">
+            <?php foreach ($popularArtists as $artist): ?>
+                <a href="../page/artist_info.php?id=<?= $artist['user_id'] ?>" 
+                style="text-decoration:none;color:inherit;">
+                    
+                    <div class="artist-card">
+                        <div class="artist-img" 
+                            style="background:#282828;display:flex;align-items:center;justify-content:center;">
+                            <i class="fa-solid fa-user" style="font-size:48px;color:#535353;"></i>
+                        </div>
+
+                        <div style="font-weight:700;margin-bottom:4px;">
+                            <?= htmlspecialchars($artist['username']) ?>
+                        </div>
+
+                        <div style="font-size:13px;color:var(--text-sub);">
+                            Nghệ sĩ
+                        </div>
+                    </div>
+                </a>
+            <?php endforeach; ?>
+        </div>
+   
 </main>
 
 <?php require_once '../partials/player.php'; ?>
