@@ -127,7 +127,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <li class="nav-item">
             <!-- Menu Thêm sự kiện -->
             <a href="../admin/admin_log.php" class="nav-link" >
-                <i class="fas fa-calendar-plus"></i>
+               <i class="fa-brands fa-font-awesome"></i>
                 <span>Nhật ký duyệt</span>
             </a>
         </li>

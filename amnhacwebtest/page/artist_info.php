@@ -1,19 +1,34 @@
 <?php
-require_once '../auth/check_login.php';
-require_once '../config/database.php';
-require_once '../partials/header.php';
-require_once '../partials/sidebar.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+try {
+    require_once '../auth/check_login.php';
+    require_once '../config/database.php';
+    require_once '../partials/header.php';
+    require_once '../partials/sidebar.php';
+} catch (Exception $e) {
+    die('Lỗi load file: ' . $e->getMessage());
+}
 
 if (!isset($_GET['id'])) {
     die('Thiếu artist id');
 }
 
 $artistId = (int)$_GET['id'];
-$conn = (new Database())->connect();
+
+try {
+    $conn = (new Database())->connect();
+} catch (Exception $e) {
+    die('Lỗi kết nối database: ' . $e->getMessage());
+}
 
 /* ===== LẤY ARTIST ===== */
 $sql = "SELECT user_id, username, avatar FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die('Lỗi prepare: ' . $conn->error);
+}
 $stmt->bind_param("i", $artistId);
 $stmt->execute();
 $artist = $stmt->get_result()->fetch_assoc();
@@ -22,10 +37,9 @@ if (!$artist) {
     die('Artist không tồn tại');
 }
 
-/* ===== LẤY BÀI HÁT (ĐÚNG THEO DB) ===== */
-
+/* ===== LẤY BÀI HÁT ===== */
 $sql = "
-    SELECT song_id, title, cover_image, cloud_url
+    SELECT song_id, title, cover_image
     FROM songs
     WHERE artist_id = ?
       AND status = 'APPROVED'
@@ -33,22 +47,65 @@ $sql = "
     ORDER BY created_at DESC
 ";
 $stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die('Lỗi prepare songs: ' . $conn->error);
+}
 $stmt->bind_param("i", $artistId);
 $stmt->execute();
 $songs_result = $stmt->get_result();
+
+// Lấy toàn bộ favorite IDs trong 1 query
+$userId = $_SESSION['user']['user_id'] ?? 0;
+$favoriteIds = [];
+
+if ($userId) {
+    $favSql = "
+        SELECT song_id FROM favorites 
+        WHERE user_id = ? 
+        AND song_id IN (
+            SELECT song_id FROM songs WHERE artist_id = ?
+        )
+    ";
+    $favStmt = $conn->prepare($favSql);
+    $favStmt->bind_param("ii", $userId, $artistId);
+    $favStmt->execute();
+    $favResult = $favStmt->get_result();
+    
+    while ($fav = $favResult->fetch_assoc()) {
+        $favoriteIds[$fav['song_id']] = true;
+    }
+}
+
+// Build songs array
 $songs = [];
 while ($row = $songs_result->fetch_assoc()) {
-    // Kiểm tra xem bài hát có trong danh sách yêu thích không
-    $userId = $_SESSION['user']['user_id'] ?? 0;
-    $favSql = "SELECT favorite_id FROM favorites WHERE user_id = ? AND song_id = ?";
-    $favStmt = $conn->prepare($favSql);
-    $favStmt->bind_param("ii", $userId, $row['song_id']);
-    $favStmt->execute();
-    $row['is_favorite'] = $favStmt->get_result()->num_rows > 0;
+    $row['is_favorite'] = isset($favoriteIds[$row['song_id']]);
     $songs[] = $row;
 }
 
+/* ===== LẤY RELATED ARTISTS ===== */
+$relatedArtists = [];
+$relatedSql = "
+    SELECT DISTINCT u.user_id, u.username, u.avatar, COUNT(s.song_id) as song_count
+    FROM users u
+    JOIN songs s ON u.user_id = s.artist_id
+    WHERE u.user_id != ?
+      AND s.status = 'APPROVED'
+      AND s.is_deleted = 0
+    GROUP BY u.user_id
+    ORDER BY song_count DESC
+    LIMIT 4
+";
+$relatedStmt = $conn->prepare($relatedSql);
+$relatedStmt->bind_param("i", $artistId);
+$relatedStmt->execute();
+$relatedResult = $relatedStmt->get_result();
+while ($row = $relatedResult->fetch_assoc()) {
+    $relatedArtists[] = $row;
+}
+
 $defaultCover = '../assets/images/default-cover.png';
+$artistAvatar = !empty($artist['avatar']) ? '../' . $artist['avatar'] : $defaultCover;
 ?>
 
 <style>
@@ -59,15 +116,14 @@ $defaultCover = '../assets/images/default-cover.png';
         padding-bottom: 100px;
     }
 
-    /* Hero Header */
     .artist-hero {
-        height: 45vh;
-        min-height: 340px;
-        max-height: 500px;
+        height: 50vh;
+        min-height: 400px;
+        max-height: 600px;
         position: relative;
         display: flex;
         align-items: flex-end;
-        padding: 0 32px 24px 32px;
+        padding: 0 32px 40px 32px;
         background-size: cover;
         background-position: center 20%;
         color: #fff;
@@ -115,19 +171,19 @@ $defaultCover = '../assets/images/default-cover.png';
     }
 
     .listener-count {
-        margin-top: 12px;
+        margin-top: 16px;
         font-size: 16px;
         font-weight: 500;
         text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
-    /* Action Bar */
     .action-bar {
-        padding: 24px 32px;
+        padding: 32px 32px;
         display: flex;
         align-items: center;
         gap: 24px;
         position: relative;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
     .btn-play-big {
@@ -155,18 +211,20 @@ $defaultCover = '../assets/images/default-cover.png';
         background: transparent;
         border: 1px solid rgba(255,255,255,0.3);
         color: #fff;
-        padding: 7px 15px;
-        border-radius: 4px;
+        padding: 8px 20px;
+        border-radius: 20px;
         font-weight: 700;
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 1px;
         cursor: pointer;
         margin-left: 8px;
+        transition: all 0.2s;
     }
 
     .btn-follow:hover {
         border-color: #fff;
+        background: rgba(255,255,255,0.1);
     }
 
     .icon-btn {
@@ -183,22 +241,21 @@ $defaultCover = '../assets/images/default-cover.png';
 
     .icon-btn:hover {
         color: #fff;
-        transform: scale(1.05);
+        transform: scale(1.1);
     }
 
     .icon-btn i.fa-solid.fa-heart {
         color: var(--spotify-green);
     }
 
-    /* Popular Section */
     .popular-section {
-        padding: 0 32px;
+        padding: 40px 32px;
     }
 
     .section-title {
-        font-size: 24px;
+        font-size: 28px;
         font-weight: 700;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
         color: #fff;
     }
 
@@ -208,10 +265,11 @@ $defaultCover = '../assets/images/default-cover.png';
     }
 
     .song-row {
-        height: 56px;
+        height: 60px;
         transition: background 0.2s;
         border-radius: 4px;
         cursor: pointer;
+        margin-bottom: 4px;
     }
 
     .song-row:hover {
@@ -220,10 +278,11 @@ $defaultCover = '../assets/images/default-cover.png';
 
     .song-row td {
         padding: 0 16px;
+        vertical-align: middle;
     }
 
     .rank-col {
-        width: 40px;
+        width: 50px;
         color: var(--text-sub);
         text-align: right;
         font-size: 16px;
@@ -234,13 +293,14 @@ $defaultCover = '../assets/images/default-cover.png';
         display: flex;
         align-items: center;
         gap: 16px;
-        height: 56px;
+        height: 60px;
+        flex: 1;
     }
 
     .song-thumb {
-        width: 40px;
-        height: 40px;
-        border-radius: 0; /* Square thumbnails like image */
+        width: 45px;
+        height: 45px;
+        border-radius: 2px;
         object-fit: cover;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
@@ -255,15 +315,73 @@ $defaultCover = '../assets/images/default-cover.png';
         color: var(--text-sub);
         font-size: 14px;
         text-align: left;
-        padding-left: 20px !important;
+        width: 180px;
     }
-<main style="margin-left:260px;padding:80px;color:white">
 
-    <h1><?= htmlspecialchars($artist['username']) ?></h1>
+    .duration-col {
+        color: var(--text-sub);
+        font-size: 14px;
+        width: 70px;
+        text-align: right;
+    }
 
-    <?php if (!empty($artist['avatar'])): ?>
-        <img src="<?= htmlspecialchars('../' . $artist['avatar']) ?>" width="120">
-    <?php endif; ?>
+    .divider {
+        height: 1px;
+        background: rgba(255,255,255,0.1);
+        margin: 40px 32px;
+    }
+
+    .related-artists {
+        padding: 0 32px 40px 32px;
+    }
+
+    .artists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 24px;
+        margin-top: 20px;
+    }
+
+    .artist-card {
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .artist-card:hover {
+        background: rgba(255,255,255,0.15);
+        transform: scale(1.02);
+    }
+
+    .artist-card a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .artist-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .artist-card-name {
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .artist-card-count {
+        color: var(--text-sub);
+        font-size: 12px;
+    }
+</style>
 
 <div class="artist-page">
     <!-- Hero Header -->
@@ -285,17 +403,13 @@ $defaultCover = '../assets/images/default-cover.png';
         <button class="btn-play-big" onclick="playFirstSong()">
             <i class="fa-solid fa-play"></i>
         </button>
-        
-        <button class="icon-btn heart-btn" onclick="toggleArtistFavorite(this)">
+        <button class="icon-btn heart-btn" onclick="toggleArtistFavorite(this)" data-artist-id="<?= $artistId ?>">
             <i class="fa-regular fa-heart"></i>
         </button>
-
         <button class="icon-btn">
             <i class="fa-solid fa-shuffle"></i>
         </button>
-        
         <button class="btn-follow">Follow</button>
-        
         <button class="icon-btn">
             <i class="fa-solid fa-ellipsis"></i>
         </button>
@@ -304,7 +418,6 @@ $defaultCover = '../assets/images/default-cover.png';
     <!-- Popular Section -->
     <div class="popular-section">
         <h2 class="section-title">Popular</h2>
-        
         <?php if (empty($songs)): ?>
             <p style="color: var(--text-sub);">Chưa có bài hát nào được đăng tải.</p>
         <?php else: ?>
@@ -315,16 +428,42 @@ $defaultCover = '../assets/images/default-cover.png';
                             <td class="rank-col"><?= $index + 1 ?></td>
                             <td>
                                 <div class="title-col">
-                                    <img src="<?= htmlspecialchars($song['cover_image'] ?: $defaultCover) ?>" class="song-thumb">
+                                    <img src="<?= htmlspecialchars($song['cover_image'] ?: $defaultCover) ?>" class="song-thumb" alt="Cover">
                                     <span class="song-name"><?= htmlspecialchars($song['title']) ?></span>
                                 </div>
                             </td>
-                            <td class="play-count-col"><?= number_format(rand(1000000, 2000000)) ?></td>
-                            <td class="duration-col"><?= rand(3, 4) ?>:<?= str_pad(rand(0, 59), 2, '0', STR_PAD_LEFT) ?></td>
+                            <td class="play-count-col"><?= number_format(rand(1000000, 2000000)) ?> plays</td>
+                            <td class="duration-col">
+                                <?= rand(3, 4) ?>:<?= str_pad(rand(0, 59), 2, '0', STR_PAD_LEFT) ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        <?php endif; ?>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Related Artists Section -->
+    <div class="related-artists">
+        <h2 class="section-title">Fans Also Like</h2>
+        <?php if (empty($relatedArtists)): ?>
+            <p style="color: var(--text-sub);">Chưa có nghệ sĩ liên quan.</p>
+        <?php else: ?>
+            <div class="artists-grid">
+                <?php foreach ($relatedArtists as $relArtist): ?>
+                    <a href="artist_info.php?id=<?= $relArtist['user_id'] ?>" class="artist-card">
+                        <?php 
+                            $relatedAvatar = !empty($relArtist['avatar']) ? '../' . $relArtist['avatar'] : $defaultCover;
+                        ?>
+                        <img src="<?= htmlspecialchars($relatedAvatar) ?>" class="artist-avatar" alt="<?= htmlspecialchars($relArtist['username']) ?>">
+                        <div class="artist-card-name"><?= htmlspecialchars($relArtist['username']) ?></div>
+                        <div class="artist-card-count"><?= $relArtist['song_count'] ?> songs</div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
     </div>
 </div>
@@ -341,38 +480,9 @@ $defaultCover = '../assets/images/default-cover.png';
         if (icon.classList.contains('fa-regular')) {
             icon.classList.remove('fa-regular');
             icon.classList.add('fa-solid');
-            icon.classList.add('fa-heart');
         } else {
             icon.classList.remove('fa-solid');
-            icon.classList.remove('fa-heart');
             icon.classList.add('fa-regular');
-            icon.classList.add('fa-heart');
         }
     }
 </script>
-    <p><?= count($songs) ?> bài hát</p>
-
-    <hr>
-
-    <h2>Bài hát</h2>
-
-    <?php if (empty($songs)): ?>
-        <p>Chưa có bài hát</p>
-    <?php else: ?>
-        <ul>
-            <?php foreach ($songs as $song): ?>
-                <li style="margin-bottom:12px">
-                    <a href="song_play.php?id=<?= $song['song_id'] ?>" style="color:white">
-                        <img 
-                            src="<?= htmlspecialchars($song['cover_image'] ?: $defaultCover) ?>"
-                            width="60"
-                            style="vertical-align:middle"
-                        >
-                        <?= htmlspecialchars($song['title']) ?>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
-
-</main>

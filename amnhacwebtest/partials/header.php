@@ -15,18 +15,17 @@ $keyword = $_GET['q'] ?? '';
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            /* Hệ thống biến màu dùng chung cho toàn bộ ứng dụng */
-            --bg-black: #000000;      /* Màu nền đen tuyền */
-            --sidebar-bg: #121212;    /* Màu xám tối cho sidebar */
-            --card-bg: #181818;       /* Màu nền cho các thẻ sản phẩm/bài hát */
-            --text-main: #ffffff;     /* Màu chữ trắng chính */
-            --text-sub: #b3b3b3;      /* Màu chữ xám cho thông tin phụ */
-            --spotify-green: #1DB954; /* Màu thương hiệu xanh lá */
-            --nav-hover: #282828;     /* Màu nền khi hover vào menu */
-            --logout-red: #f15555;    /* Màu đỏ cho nút đăng xuất/xóa */
-            --table-border: #282828;  /* Màu đường viền bảng */
-            --player-bg: #121212;     /* Màu nền trình phát nhạc */
-            --glass: rgba(255, 255, 255, 0.05); /* Hiệu ứng kính mờ (glassmorphism) */
+            --bg-black: #000000;
+            --sidebar-bg: #121212;
+            --card-bg: #181818;
+            --text-main: #ffffff;
+            --text-sub: #b3b3b3;
+            --spotify-green: #1DB954;
+            --nav-hover: #282828;
+            --logout-red: #f15555;
+            --table-border: #282828;
+            --player-bg: #121212;
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
         * { 
@@ -38,7 +37,7 @@ $keyword = $_GET['q'] ?? '';
             margin: 0; 
             background-color: var(--bg-black); 
             color: var(--text-main); 
-            overflow-x: hidden; /* Ngăn chặn cuộn ngang trình duyệt */
+            overflow-x: hidden;
         }
 
         .app-container {
@@ -46,11 +45,10 @@ $keyword = $_GET['q'] ?? '';
             min-height: 100vh;
         }
 
-        /* Reverted Search Header Styles */
         .top-nav {
             position: fixed;
             top: 0;
-            left: 260px; /* Reverted to 260px */
+            left: 260px;
             right: 0;
             height: 64px;
             background: rgba(0, 0, 0, 0.7);
@@ -62,50 +60,42 @@ $keyword = $_GET['q'] ?? '';
             z-index: 1000;
         }
 
-        .nav-center {
+        .search-form {
             flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start; /* Align search to left in center area */
-            gap: 8px;
             max-width: 500px;
         }
 
-        .search-container {
-            position: relative;
-            flex: 1;
-            max-width: 400px;
-        }
-
-        .search-container i {
+        .search-icon {
             position: absolute;
             left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #b3b3b3;
+            color: #000;
             font-size: 16px;
+            pointer-events: none;
         }
 
         .search-input {
             width: 100%;
-            height: 40px; /* Slightly smaller for cleaner look */
-            background: #242424;
+            height: 40px;
+            background: #fff;
             border: none;
-            border-radius: 20px;
-            padding: 0 40px;
-            color: #fff;
+            border-radius: 500px;
+            padding: 0 48px;
+            font-family: 'Outfit', sans-serif;
             font-size: 14px;
-            transition: background 0.2s;
-        }
-
-        .search-input:hover { background: #f0ebebff; }
-        .search-input:focus {
+            color: #000;
             outline: none;
-            background: #2a2a2a;
-            box-shadow: 0 0 0 1px #fff;
+            position: relative;
         }
 
-        .search-input::placeholder { color: #b3b3b3; }
+        .search-input::placeholder { 
+            color: #999;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 2px var(--spotify-green);
+        }
 
         .nav-right {
             display: flex;
@@ -117,40 +107,21 @@ $keyword = $_GET['q'] ?? '';
             position: relative;
         }
 
-        .search-icon {
-            position: absolute;
-            left: 46px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #000;
-            font-size: 18px;
-        }
-        .search-input {
-            width: 100%;
-            background: #fff;
-            border: none;
-            padding: 12px 48px;
-            border-radius: 500px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 14px;
-            color: #000;
-            outline: none;
-        }
         .user-menu {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             padding: 4px 12px 4px 4px;
             border-radius: 32px;
             cursor: pointer;
             transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .user-menu:hover { 
             background: #282828;
-            border-color: rgba(255,255,255,0.2);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .user-avatar {
@@ -163,6 +134,7 @@ $keyword = $_GET['q'] ?? '';
             justify-content: center;
             font-size: 14px;
             color: #fff;
+            flex-shrink: 0;
         }
 
         .user-name { 
@@ -170,9 +142,12 @@ $keyword = $_GET['q'] ?? '';
             font-weight: 700; 
             color: #fff;
             margin-right: 4px;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* Dropdown Menu Styles */
         .dropdown-menu {
             position: absolute;
             top: 50px;
@@ -181,14 +156,16 @@ $keyword = $_GET['q'] ?? '';
             background: #282828;
             border-radius: 4px;
             padding: 4px;
-            box-shadow: 0 16px 24px rgba(0,0,0,0.5);
+            box-shadow: 0 16px 24px rgba(0, 0, 0, 0.5);
             display: none;
             flex-direction: column;
             z-index: 1001;
             animation: fadeInScale 0.2s ease-out;
         }
 
-        .dropdown-menu.show { display: flex; }
+        .dropdown-menu.show { 
+            display: flex; 
+        }
 
         .dropdown-item {
             padding: 12px 16px;
@@ -201,16 +178,18 @@ $keyword = $_GET['q'] ?? '';
             transition: background 0.2s;
         }
 
-        .dropdown-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .dropdown-item:hover { 
+            background: rgba(255, 255, 255, 0.1); 
+            color: #fff; 
+        }
 
         .dropdown-divider {
             height: 1px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             margin: 4px 0;
             border: none;
         }
 
-        /* Nút đăng nhập/đăng ký */
         .btn-auth {
             color: var(--text-main);
             text-decoration: none;
@@ -219,10 +198,18 @@ $keyword = $_GET['q'] ?? '';
             padding: 8px 24px;
             border-radius: 500px;
             transition: transform 0.2s;
+            border: none;
+            cursor: pointer;
         }
 
-        .btn-login { background: #fff; color: #000; }
-        .btn-login:hover { transform: scale(1.05); }
+        .btn-login { 
+            background: #fff; 
+            color: #000; 
+        }
+
+        .btn-login:hover { 
+            transform: scale(1.05); 
+        }
 
         @keyframes fadeInScale {
             from { opacity: 0; transform: scale(0.95) translateY(-10px); }
@@ -236,54 +223,61 @@ $keyword = $_GET['q'] ?? '';
 
 <div class="app-container">
     <header class="top-nav">
-
-        <div>
-        <!-- thanh search nha -->   
-        <form method="GET" action="../services/search.php" class="search-form">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input 
-                type="text"
-                name="q"
-                class="search-input"
-                placeholder="Bạn muốn nghe gì?"
-                value="<?= htmlspecialchars($keyword) ?>"
-                required
-            >
-        </form>
+        <div class="search-form">
+            <form method="GET" action="../services/search.php" style="position: relative;">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input 
+                    type="text"
+                    name="q"
+                    class="search-input"
+                    placeholder="Bạn muốn nghe gì?"
+                    value="<?= htmlspecialchars($keyword) ?>"
+                    required
+                >
+            </form>
         </div>
+
         <div class="nav-right">
-            <?php if (isset($_SESSION['user'])): ?>
+            <?php if (isset($_SESSION['user']) && !empty($_SESSION['user'])): ?>
                 <div class="user-container">
                     <div class="user-menu" id="userMenuTrigger">
                         <div class="user-avatar">
                             <i class="fa-solid fa-user"></i>
                         </div>
-                        <span class="user-name"><?= htmlspecialchars($_SESSION['user']['username']) ?></span>
-                        <i class="fa-solid fa-caret-down" style="font-size: 12px; color: var(--text-sub);"></i>
+                        <span class="user-name"><?= htmlspecialchars($_SESSION['user']['username'] ?? 'User') ?></span>
+                        <i class="fa-solid fa-caret-down" style="font-size: 12px; color: var(--text-sub); flex-shrink: 0;"></i>
                     </div>
                     
                     <div class="dropdown-menu" id="userMenuDropdown">
-                        <a href="../page/user_info.php" class="dropdown-item">Tài khoản</a>
+                        <a href="../page/user_info.php" class="dropdown-item">
+                            <i class="fa-solid fa-user" style="margin-right: 8px;"></i>Tài khoản
+                        </a>
                         <hr class="dropdown-divider">
-                        <a href="../auth/logout.php" class="dropdown-item" style="color: var(--logout-red);">Đăng xuất</a>
+                        <a href="../auth/logout.php" class="dropdown-item" style="color: var(--logout-red);">
+                            <i class="fa-solid fa-sign-out-alt" style="margin-right: 8px;"></i>Đăng xuất
+                        </a>
                     </div>
                 </div>
 
                 <script>
-                    const trigger = document.getElementById('userMenuTrigger');
-                    const dropdown = document.getElementById('userMenuDropdown');
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const trigger = document.getElementById('userMenuTrigger');
+                        const dropdown = document.getElementById('userMenuDropdown');
 
-                    trigger.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        dropdown.classList.toggle('show');
-                    });
+                        if (trigger && dropdown) {
+                            trigger.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                dropdown.classList.toggle('show');
+                            });
 
-                    document.addEventListener('click', () => {
-                        dropdown.classList.remove('show');
-                    });
+                            document.addEventListener('click', () => {
+                                dropdown.classList.remove('show');
+                            });
 
-                    dropdown.addEventListener('click', (e) => {
-                        e.stopPropagation();
+                            dropdown.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                            });
+                        }
                     });
                 </script>
             <?php else: ?>

@@ -1,6 +1,6 @@
 <?php
 require_once "../config/database.php";
-// require_once "../auth/check_login.php";
+require_once "../auth/check_login.php";
 
 if (empty($_SESSION['cart'])) {
     header("Location: cart.php");
@@ -20,7 +20,7 @@ foreach ($_SESSION['cart'] as $item) {
     $price   = $item['price'];
 
     // Lấy thông tin đĩa và hình ảnh bài hát từ DB
-    $sql = "SELECT s.title, s.image_path 
+    $sql = "SELECT s.title, s.cover_image 
             FROM discs d 
             JOIN songs s ON d.song_id = s.song_id
             WHERE d.disc_id = ?";
@@ -33,7 +33,7 @@ foreach ($_SESSION['cart'] as $item) {
 
     $cart_items[] = [
         'name'  => $disc['title'],
-        'image' => $disc['image_path'],
+        'image' => $disc['cover_image'],  // Sử dụng cover_image thay vì image_path
         'price' => $price
     ];
 }
@@ -227,7 +227,7 @@ include "../partials/sidebar.php";
                 <ul class="order-items">
                     <?php foreach ($cart_items as $item): ?>
                         <li class="order-item">
-                            <img src="../assets/img/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" onerror="this.src='../assets/img/default-song.png'">
+                            <img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" onerror="this.src='https://via.placeholder.com/48?text=No+Image'">
                             <div class="item-info">
                                 <span class="item-name"><?= htmlspecialchars($item['name']) ?></span>
                                 <span class="item-price"><?= number_format($item['price']) ?>đ</span>
