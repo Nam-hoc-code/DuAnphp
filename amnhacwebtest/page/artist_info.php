@@ -31,6 +31,7 @@ $sql = "
       AND status = 'APPROVED'
       AND is_deleted = 0
     ORDER BY created_at DESC
+
 ";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $artistId);
