@@ -1,6 +1,9 @@
 <?php 
+// Kiểm tra quyền admin trước khi truy cập trang
 require_once __DIR__ . "/check_admin.php";
+// Kết nối cơ sở dữ liệu
 require_once __DIR__ . "/../config/database.php";
+// Lấy dữ liệu thống kê cho Dashboard (tổng số user, bài hát,...)
 require_once "dash_board.php";
 ?>
 <!DOCTYPE html>
@@ -9,60 +12,62 @@ require_once "dash_board.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Spotify</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-body: #000000;
-            --bg-sidebar: #121212;
-            --bg-card: #181818;
-            --bg-card-hover: #282828;
-            --accent-green: #1DB954;
-            --accent-cyan: #00DBFF;
-            --text-main: #ffffff;
-            --text-muted: #b3b3b3;
+            /* Định nghĩa bảng màu cho toàn bộ trang Admin */
+            --bg-body: #000000;      /* Màu nền chính */
+            --bg-sidebar: #121212;   /* Màu nền thanh menu bên trái */
+            --bg-card: #181818;      /* Màu nền của các thẻ thống kê */
+            --bg-card-hover: #282828; /* Màu khi di chuột qua thẻ */
+            --accent-green: #1DB954; /* Màu xanh Spotify */
+            --accent-cyan: #00DBFF;  /* Màu xanh cyan cho icon */
+            --text-main: #ffffff;    /* Màu chữ trắng chính */
+            --text-muted: #b3b3b3;   /* Màu chữ xám mô tả */
         }
 
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
+            box-sizing: border-box; /* Giúp tính toán kích thước phần tử chính xác hơn */
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
             background-color: var(--bg-body);
             color: var(--text-main);
-            display: flex;
+            display: flex; /* Sử dụng flexbox để căn chỉnh sidebar và nội dung */
             min-height: 100vh;
         }
 
-        /* Main Content Styling */
+        /* Nội dung chính của trang (bên phải sidebar) */
         .main-content {
-            margin-left: 240px;
+            margin-left: 240px; /* Chừa khoảng trống cho sidebar cố định */
             flex-grow: 1;
             padding: 32px;
-            background: linear-gradient(to bottom, #222 0%, #000 300px);
+            background: linear-gradient(to bottom, #222 0%, #000 300px); /* Hiệu ứng đổ màu nền */
         }
 
         .header {
-            margin-bottom: 32px;
+            margin-bottom: 32px; /* Khoảng cách dưới tiêu đề */
         }
 
         .header h1 {
             font-size: 32px;
             margin-bottom: 8px;
-            font-family: 'Times New Roman', Times, serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase; /* Viết hoa toàn bộ tiêu đề */
+            letter-spacing: 1px; /* Khoảng cách giữa các chữ cái */
         }
 
-        /* Stats Grid */
+        /* Lưới hiển thị các thẻ thống kê */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Tự động điều chỉnh số cột */
+            gap: 24px; /* Khoảng cách giữa các thẻ */
             margin-bottom: 48px;
         }
 
@@ -70,7 +75,7 @@ require_once "dash_board.php";
             background-color: var(--bg-card);
             padding: 24px;
             border-radius: 8px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s; /* Hiệu ứng chuyển màu mượt mà */
             cursor: default;
             display: flex;
             align-items: center;
@@ -79,9 +84,10 @@ require_once "dash_board.php";
         }
 
         .stat-card:hover {
-            background-color: var(--bg-card-hover);
+            background-color: var(--bg-card-hover); /* Đổi màu nền khi di chuột vào */
         }
 
+        /* Hình khối tròn chứa icon */
         .stat-icon {
             width: 60px;
             height: 60px;
@@ -92,6 +98,7 @@ require_once "dash_board.php";
             font-size: 24px;
         }
 
+        /* Màu sắc riêng cho từng loại icon */
         .icon-users { background-color: rgba(0, 219, 255, 0.1); color: var(--accent-cyan); }
         .icon-songs { background-color: rgba(29, 185, 84, 0.1); color: var(--accent-green); }
         .icon-pending { background-color: rgba(255, 165, 0, 0.1); color: #ffa500; }
@@ -109,9 +116,10 @@ require_once "dash_board.php";
             font-weight: bold;
         }
 
+        /* Xử lý giao diện trên màn hình nhỏ (Mobile/Tablet) */
         @media (max-width: 768px) {
             .main-content {
-                margin-left: 80px;
+                margin-left: 80px; /* Thu hẹp lề trái khi sidebar thu nhỏ */
             }
         }
     </style>
@@ -119,6 +127,7 @@ require_once "dash_board.php";
 <body>
 
 
+<!-- Nhúng thanh Sidebar dùng chung -->
 <?php include 'sidebar.php'; ?>
 
 <div class="main-content">
@@ -126,7 +135,9 @@ require_once "dash_board.php";
         <h1>Admin Dashboard</h1>
     </div>
 
+    <!-- Lưới hiển thị các thẻ thống kê -->
     <div class="stats-grid">
+        <!-- Thẻ thống kê Người dùng -->
         <div class="stat-card">
             <div class="stat-icon icon-users">
                 <i class="fas fa-users"></i>
@@ -137,6 +148,7 @@ require_once "dash_board.php";
             </div>
         </div>
 
+        <!-- Thẻ thống kê Bài hát -->
         <div class="stat-card">
             <div class="stat-icon icon-songs">
                 <i class="fas fa-music"></i>
@@ -147,6 +159,7 @@ require_once "dash_board.php";
             </div>
         </div>
 
+        <!-- Thẻ thống kê Bài hát chờ duyệt -->
         <div class="stat-card">
             <div class="stat-icon icon-pending">
                 <i class="fas fa-hourglass-half"></i>

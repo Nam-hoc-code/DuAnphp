@@ -4,28 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - Spotify</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #000000;
-            --input-bg: #1A1A1A;
-            --accent-color: #00DBFF;
-            --text-color: #ffffff;
-            --label-color: #ffffff;
-            --border-color: #444444;
+            /* Các biến màu sắc chuẩn cho giao diện đăng nhập */
+            --bg-color: #000000;      /* Màu nền đen */
+            --input-bg: #1A1A1A;      /* Màu nền ô nhập liệu */
+            --accent-color: #00DBFF;  /* Màu xanh cyan làm điểm nhấn */
+            --text-color: #ffffff;    /* Màu chữ trắng */
+            --label-color: #ffffff;   /* Màu chữ của tiêu đề ô */
+            --border-color: #444444;  /* Màu đường viền */
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            display: flex;
+            display: flex; /* Sử dụng Flexbox để căn giữa toàn bộ khối đăng nhập */
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -49,12 +50,13 @@
             gap: 40px;
         }
 
+        /* Khung chứa ảnh logo tròn */
         .logo-container {
             width: 180px;
             height: 180px;
             background-color: transparent;
-            border-radius: 50%;
-            border: 6px solid white;
+            border-radius: 50%; /* Tạo hình tròn */
+            border: 6px solid white; /* Viền trắng bao quanh logo */
             padding: 20px;
             display: flex;
             justify-content: center;
@@ -73,7 +75,8 @@
         }
 
         .titles h1 {
-            font-family: 'Times New Roman', Times, serif;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
             font-size: 34px;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -83,7 +86,8 @@
         }
 
         .titles h2 {
-            font-family: 'Times New Roman', Times, serif;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
             font-size: 30px;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -124,6 +128,7 @@
             border-color: #555;
         }
 
+        /* Nút đăng nhập */
         .btn-submit {
             background-color: #00DBFF;
             color: #000;
@@ -138,7 +143,7 @@
         }
 
         .btn-submit:active {
-            transform: scale(0.98);
+            transform: scale(0.98); /* Hiệu ứng lún xuống khi nhấn chuột */
         }
 
         .footer-links {

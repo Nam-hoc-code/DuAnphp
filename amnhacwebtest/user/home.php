@@ -186,10 +186,219 @@ $defaultCover = '../assets/images/default-cover.png';
     }
 
     .fav-btn:hover { color: #fff; transform: scale(1.1); }
+    .fav-btn.active { color: var(--spotify-green) !important; }
+    .fav-btn.active i { font-weight: 900; }
+
+    /* Slider Styles */
+    .slider-container {
+        position: relative;
+        width: 100%;
+        height: 288px;
+        border-radius: 12px;
+        margin-bottom: 40px;
+        overflow: hidden;
+        /* Soft blurred bottom shadow */
+        box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Gradient overlay to fade the bottom of the slide content into the shadow area */
+    .slide::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .slider-wrapper {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .slide {
+        min-width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 0 60px;
+        background: #121212;
+    }
+
+    .slide::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, #121212 20%, transparent 80%);
+        z-index: 1;
+    }
+
+    .slide-content {
+        position: relative;
+        z-index: 2;
+        max-width: 550px;
+        /* Reverted to left align */
+    }
+
+    .slide-tag {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        background: var(--spotify-green);
+        color: #000;
+        padding: 4px 12px;
+        border-radius: 40px;
+        margin-bottom: 20px;
+        display: inline-block;
+        letter-spacing: 1px;
+    }
+
+    .slide-title {
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        line-height: 1.1;
+        color: #fff;
+    }
+
+    .slide-desc {
+        font-size: 16px;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 30px;
+    }
+
+    .slide-img {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 60%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+    }
+
+    .slider-dots {
+        position: absolute;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 3;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dot.active {
+        background: #fff;
+        width: 24px;
+        border-radius: 4px;
+    }
+
+    .btn-play-now {
+        background: #fff;
+        color: #000;
+        padding: 12px 32px;
+        border-radius: 30px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s;
+        margin: 0 auto; /* Added for centering */
+    }
+
+    .btn-wrap {
+        width: 100%;
+        text-align: center; /* Centers the inline-block button */
+        margin-top: 20px;
+    }
+
+    .btn-play-now:hover {
+        transform: scale(1.05);
+        background: var(--spotify-green);
+    }
+
+
 </style>
 
 <main class="main-content">
     
+    <!-- Hero Slider -->
+    <div class="slider-container">
+        <div class="slider-wrapper" id="sliderWrapper">
+            <!-- Slide 1 -->
+            <div class="slide">
+                <img src="../assets/img/anh-son-tung-mtp-10.jpg" class="slide-img" alt="Âm thầm bên em">
+                <div class="slide-content">
+                    <div class="slide-tag">Thịnh hành</div>
+                    <h1 class="slide-title">Âm Thầm Bên Em</h1>
+                    <p class="slide-desc">Một bản hít đình đám mang đậm phong cách Sơn Tùng M-TP.</p>
+                    <div class="btn-wrap">
+                        <a href="#" class="btn-play-now">Nghe ngay</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="slide">
+                <img src="../assets/img/anh-son-tung-mtp-12.jpg" class="slide-img" alt="Buông đôi tay nhau ra">
+                <div class="slide-content">
+                    <div class="slide-tag">Đề xuất</div>
+                    <h1 class="slide-title">Buông Đôi Tay Nhau Ra</h1>
+                    <p class="slide-desc">Cùng thưởng thức giai điệu bắt tai và ca từ ý nghĩa.</p>
+                    <div class="btn-wrap">
+                        <a href="#" class="btn-play-now">Nghe ngay</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 3 -->
+            <div class="slide">
+                <img src="../assets/img/anh-son-tung-mtp-13.jpg" class="slide-img" alt="Phép màu">
+                <div class="slide-content">
+                    <div class="slide-tag">Mới phát hành</div>
+                    <h1 class="slide-title">Phép Màu</h1>
+                    <p class="slide-desc">Giai điệu diệu kỳ xoa dịu tâm hồn bạn mỗi ngày.</p>
+                    <div class="btn-wrap">
+                        <a href="#" class="btn-play-now">Nghe ngay</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 4 -->
+            <div class="slide">
+                <img src="../assets/img/sontungmtp.jpg" class="slide-img" alt="Mất kết nối">
+                <div class="slide-content">
+                    <div class="slide-tag">Hot hit</div>
+                    <h1 class="slide-title">Mất Kết Nối</h1>
+                    <p class="slide-desc">Đừng để âm nhạc của bạn bị gián đoạn, hãy nghe ngay!</p>
+                    <div class="btn-wrap">
+                        <a href="#" class="btn-play-now">Nghe ngay</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slider-dots" id="sliderDots">
+            <div class="dot active" onclick="goToSlide(0)"></div>
+            <div class="dot" onclick="goToSlide(1)"></div>
+            <div class="dot" onclick="goToSlide(2)"></div>
+            <div class="dot" onclick="goToSlide(3)"></div>
+        </div>
+    </div>
+
     <div class="section-title">
         <span>Danh sách bài hát</span>
         <a href="#">Xem tất cả</a>
@@ -208,14 +417,15 @@ $defaultCover = '../assets/images/default-cover.png';
                     </div>
                 </div>
                 <div class="card-title"><?= htmlspecialchars($song['title']) ?></div>
-                <div class="card-subtitle">
-                    <?= htmlspecialchars($song['artist_name'] ?? 'Nghệ sĩ') ?>
-                    <form action="../favorite/add_favorite.php" method="POST" style="display:inline; float:right;" onclick="event.stopPropagation();">
-                        <input type="hidden" name="song_id" value="<?= $song['song_id'] ?>">
-                        <button type="submit" class="fav-btn" title="Thêm vào yêu thích">
-                            <i class="fa-regular fa-heart"></i>
-                        </button>
-                    </form>
+                <div class="card-subtitle" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <?= htmlspecialchars($song['artist_name'] ?? 'Nghệ sĩ') ?>
+                    </span>
+                    <button class="fav-btn <?= ($song['is_favorite'] > 0) ? 'active' : '' ?>" 
+                            onclick="toggleFavorite(event, <?= $song['song_id'] ?>, this)" 
+                            title="<?= ($song['is_favorite'] > 0) ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích' ?>">
+                        <i class="<?= ($song['is_favorite'] > 0) ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
+                    </button>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -264,3 +474,73 @@ $defaultCover = '../assets/images/default-cover.png';
 </main>
 
 <?php require_once '../partials/player.php'; ?>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const wrapper = document.getElementById('sliderWrapper');
+    const dots = document.querySelectorAll('.dot');
+    const totalSlides = slides.length;
+
+    function updateSlider() {
+        wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
+        });
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        updateSlider();
+    }
+
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateSlider();
+    }
+
+    // Auto slide every 5 seconds
+    let slideInterval = setInterval(nextSlide, 2000);
+
+    // Pause on hover
+    const sliderContainer = document.querySelector('.slider-container');
+    sliderContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+    sliderContainer.addEventListener('mouseleave', () => {
+        slideInterval = setInterval(nextSlide, 2000);
+    });
+    function toggleFavorite(event, songId, button) {
+        event.stopPropagation();
+        
+        const formData = new FormData();
+        formData.append('song_id', songId);
+
+        fetch('../favorite/toggle_favorite.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const icon = button.querySelector('i');
+                if (data.action === 'added') {
+                    button.classList.add('active');
+                    button.title = 'Xóa khỏi yêu thích';
+                    icon.classList.remove('fa-regular');
+                    icon.classList.add('fa-solid');
+                } else {
+                    button.classList.remove('active');
+                    button.title = 'Thêm vào yêu thích';
+                    icon.classList.remove('fa-solid');
+                    icon.classList.add('fa-regular');
+                }
+            } else if (data.message === 'Please login first') {
+                window.location.href = '../auth/login_form.php';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>

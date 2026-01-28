@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng ký - Spotify</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #000000;
@@ -19,7 +19,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
@@ -73,7 +73,8 @@
         }
 
         .titles h1 {
-            font-family: 'Times New Roman', Times, serif;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
             font-size: 34px;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -83,7 +84,8 @@
         }
 
         .titles h2 {
-            font-family: 'Times New Roman', Times, serif;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
             font-size: 30px;
             text-transform: uppercase;
             letter-spacing: 2px;

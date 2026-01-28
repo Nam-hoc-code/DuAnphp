@@ -1,10 +1,13 @@
 <?php
+// Kiểm tra quyền truy cập admin
 require_once __DIR__ . "/check_admin.php";
+// Kết nối cơ sở dữ liệu
 require_once __DIR__ . "/../config/database.php";
 
 $db = new Database();
 $conn = $db->connect();
 
+// Truy vấn lấy danh sách các bài hát có trạng thái 'PENDING' (Đang chờ duyệt)
 $sql = "
 SELECT s.song_id, s.title, u.username AS artist, s.created_at, s.cover_image
 FROM songs s
@@ -21,26 +24,27 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Duyệt bài hát - Spotify Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-body: #000000;
-            --bg-sidebar: #121212;
-            --bg-card: #181818;
-            --bg-card-hover: #282828;
-            --accent-green: #1DB954;
-            --accent-cyan: #00DBFF;
-            --text-main: #ffffff;
-            --text-muted: #b3b3b3;
-            --danger: #e91429;
+            /* Các biến màu chủ đạo cho trang */
+            --bg-body: #000000;      /* Màu nền chính tối */
+            --bg-sidebar: #121212;   /* Màu nền sidebar */
+            --bg-card: #181818;      /* Màu nền thẻ/khối */
+            --bg-card-hover: #282828; /* Màu nền khi di chuột qua */
+            --accent-green: #1DB954; /* Màu xanh Spotify truyền thống */
+            --accent-cyan: #00DBFF;  /* Màu xanh cyan */
+            --text-main: #ffffff;    /* Màu chữ trắng chính */
+            --text-muted: #b3b3b3;   /* Màu chữ xám mô tả */
+            --danger: #e91429;       /* Màu đỏ cho các cảnh báo/cấm */
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
@@ -50,12 +54,12 @@ $result = $conn->query($sql);
             min-height: 100vh;
         }
 
-        /* Main Content */
+        /* Cấu trúc nội dung chính */
         .main-content {
-            margin-left: 240px;
-            flex-grow: 1;
+            margin-left: 240px; /* Lùi lề trái để nhường chỗ cho sidebar dính */
+            flex-grow: 1; /* Cho phép nội dung mở rộng hết phần còn lại */
             padding: 32px;
-            background: linear-gradient(to bottom, #222 0%, #000 300px);
+            background: linear-gradient(to bottom, #222 0%, #000 300px); /* Nền chuyển màu từ xám sang đen */
         }
 
         .header {
@@ -64,21 +68,23 @@ $result = $conn->query($sql);
 
         .header h1 {
             font-size: 32px;
-            font-family: 'Times New Roman', Times, serif;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        /* Song Table Styling */
+        /* Container chứa bảng danh sách */
         .song-list-container {
-            background-color: rgba(24, 24, 24, 0.5);
-            border-radius: 8px;
+            background-color: rgba(24, 24, 24, 0.5); /* Nền đen trong suốt nhẹ */
+            border-radius: 8px; /* Bo góc khối */
             padding: 20px;
         }
 
+        /* Thiết lập bảng */
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: collapse; /* Loại bỏ khoảng cách giữa các viền ô */
             text-align: left;
         }
 
@@ -88,7 +94,7 @@ $result = $conn->query($sql);
             font-size: 12px;
             letter-spacing: 1px;
             padding-bottom: 12px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #333; /* Đường gạch dưới tiêu đề cột */
         }
 
         tbody tr {
@@ -96,15 +102,16 @@ $result = $conn->query($sql);
         }
 
         tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.1); /* Sáng lên khi di chuột qua hàng */
         }
 
         td {
             padding: 12px 0;
             vertical-align: middle;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Đường gạch dưới mờ cho mỗi hàng */
         }
 
+        /* Khối thông tin bài hát (Ảnh + Tên) */
         .song-info {
             display: flex;
             align-items: center;
@@ -116,7 +123,7 @@ $result = $conn->query($sql);
             height: 40px;
             border-radius: 4px;
             background-color: #333;
-            object-fit: cover;
+            object-fit: cover; /* Đảm bảo ảnh không bị méo */
         }
 
         .song-details b {
@@ -129,6 +136,7 @@ $result = $conn->query($sql);
             color: var(--text-muted);
         }
 
+        /* Các nút bấm hành động */
         .actions {
             display: flex;
             gap: 10px;
@@ -145,19 +153,20 @@ $result = $conn->query($sql);
         }
 
         .btn-approve {
-            background-color: var(--accent-green);
+            background-color: var(--accent-green); /* Nút Duyệt màu xanh */
             color: black;
         }
 
         .btn-reject {
-            border: 1px solid var(--text-muted);
+            border: 1px solid var(--text-muted); /* Nút Từ chối dạng viền */
             color: white;
         }
 
         .btn-action:hover {
-            transform: scale(1.05);
+            transform: scale(1.05); /* Phóng to nhẹ khi di chuột qua nút */
         }
 
+        /* Giao diện khi danh sách trống */
         .empty-state {
             text-align: center;
             padding: 40px;
@@ -171,6 +180,7 @@ $result = $conn->query($sql);
 </head>
 <body>
 
+<!-- Nhúng sidebar -->
 <?php include 'sidebar.php'; ?>
 
 <div class="main-content">
@@ -178,8 +188,10 @@ $result = $conn->query($sql);
         <h1>Danh sách chờ duyệt</h1>
     </div>
 
+    <!-- Container chứa bảng danh sách bài hát -->
     <div class="song-list-container">
         <?php if ($result->num_rows > 0): ?>
+            <!-- Hiển thị bảng nếu có bài hát chờ duyệt -->
             <table>
                 <thead>
                     <tr>
@@ -192,6 +204,7 @@ $result = $conn->query($sql);
                     <?php $i = 1; while ($row = $result->fetch_assoc()): ?>
                         <tr>
                             <td>
+                                <!-- Thông tin bài hát: Ảnh và Tiêu đề/Nghệ sĩ -->
                                 <div class="song-info">
                                     <img src="<?= !empty($row['cover_image']) ? $row['cover_image'] : 'https://via.placeholder.com/40' ?>" class="song-img" alt="">
                                     <div class="song-details">
@@ -202,6 +215,7 @@ $result = $conn->query($sql);
                             </td>
                             <td><?= date('d/m/Y', strtotime($row['created_at'])) ?></td>
                             <td>
+                                <!-- Các nút hành động: Duyệt hoặc Từ chối -->
                                 <div class="actions">
                                     <a href="approve_song.php?id=<?= $row['song_id'] ?>" class="btn-action btn-approve">Duyệt</a>
                                     <a href="reject_song.php?id=<?= $row['song_id'] ?>" class="btn-action btn-reject">Từ chối</a>
@@ -212,6 +226,7 @@ $result = $conn->query($sql);
                 </tbody>
             </table>
         <?php else: ?>
+            <!-- Hiển thị thông báo nếu không có bài hát nào -->
             <div class="empty-state">
                 <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 16px; color: var(--accent-green);"></i>
                 <p>Không có bài hát nào đang chờ duyệt!</p>
