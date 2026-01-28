@@ -54,6 +54,7 @@ $sql = "
     SELECT 
         u.user_id,
         u.username,
+        u.avatar,
         COUNT(*) AS total_songs
     FROM songs s
     JOIN users u ON s.artist_id = u.user_id
