@@ -29,8 +29,9 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <style>
+    /* Container nội dung chính của cửa hàng đĩa */
     .disc-content {
-        margin-left: 260px;
+        margin-left: 260px; /* Nhường chỗ cho sidebar bên trái */
         padding: 80px 32px 120px 32px;
         width: calc(100% - 260px);
         min-height: 100vh;
@@ -46,6 +47,7 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
     .shop-title h1 { font-size: 2rem; font-weight: 800; margin: 0; }
     .shop-title p { color: var(--text-sub); margin-top: 4px; }
 
+    /* Nút giỏ hàng màu trắng nổi bật */
     .cart-link {
         background: #fff;
         color: #000;
@@ -58,7 +60,7 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         gap: 8px;
         transition: transform 0.2s;
     }
-    .cart-link:hover { transform: scale(1.05); }
+    .cart-link:hover { transform: scale(1.05); } /* Hiệu ứng phóng to nhẹ khi di chuột */
 
     .disc-grid {
         display: grid;
@@ -66,6 +68,7 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         gap: 24px;
     }
 
+    /* Thẻ hiển thị thông tin đĩa nhạc */
     .disc-card {
         background: #181818;
         padding: 16px;
@@ -73,11 +76,12 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         transition: background 0.3s;
         border: 1px solid #282828;
     }
-    .disc-card:hover { background: #282828; }
+    .disc-card:hover { background: #282828; } /* Đổi màu nền sáng hơn khi hover */
 
+    /* Hiệu ứng đổ bóng cho ảnh đĩa */
     .disc-img-wrapper {
         position: relative;
-        padding-bottom: 100%;
+        padding-bottom: 100%; /* Giữ tỉ lệ khung hình vuông 1:1 */
         margin-bottom: 16px;
         box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
@@ -86,7 +90,7 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         position: absolute;
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: cover; /* Cắt ảnh vừa khít khung hình vuông */
         border-radius: 4px;
     }
 
@@ -104,7 +108,7 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
     .disc-price {
         font-size: 1.2rem;
         font-weight: 700;
-        color: var(--spotify-green);
+        color: var(--spotify-green); /* Giá tiền màu xanh lá đặc trưng */
         margin-bottom: 16px;
         display: block;
     }

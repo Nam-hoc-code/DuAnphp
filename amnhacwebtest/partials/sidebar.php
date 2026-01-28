@@ -10,6 +10,8 @@ if (session_status() === PHP_SESSION_NONE) {
         height: 100vh; 
         background: var(--bg-black); 
         position: fixed; 
+        top: 0;
+        left: 0;
         padding: 24px 8px; 
         display: flex;
         flex-direction: column;
@@ -20,8 +22,8 @@ if (session_status() === PHP_SESSION_NONE) {
     .logo-container {
         display: flex;
         align-items: center;
-        padding: 0 16px 24px 16px;
-        gap: 8px;
+        padding: 0 16px 10px 14px;
+        gap: 14px;
         color: #fff;
     }
     .logo-container i { font-size: 28px; color: var(--spotify-green); }
@@ -70,6 +72,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <a href="../user/home.php" class="nav-link <?= strpos($_SERVER['PHP_SELF'], 'home.php') !== false ? 'active' : '' ?>">
             <i class="fa-solid fa-house"></i> Trang chủ
         </a>
+   
         <a href="../favorite/favorite_list.php" class="nav-link <?= strpos($_SERVER['PHP_SELF'], 'favorite_list.php') !== false ? 'active' : '' ?>">
             <i class="fa-solid fa-heart"></i> Yêu thích
         </a>
