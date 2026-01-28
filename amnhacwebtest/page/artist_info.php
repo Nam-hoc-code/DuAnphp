@@ -22,9 +22,9 @@ if (!$artist) {
     die('Artist không tồn tại');
 }
 
-/* ===== LẤY BÀI HÁT ===== */
+/* ===== LẤY BÀI HÁT (ĐÚNG THEO DB) ===== */
 $sql = "
-    SELECT song_id, title, cover_image, cloud_url, created_at
+    SELECT song_id, title, cover_image, cloud_url
     FROM songs
     WHERE artist_id = ?
       AND status = 'APPROVED'
