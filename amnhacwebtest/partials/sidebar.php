@@ -82,6 +82,9 @@ if (session_status() === PHP_SESSION_NONE) {
         <a href="../event/event_list.php" class="nav-link <?= strpos($_SERVER['PHP_SELF'], 'event_list.php') !== false ? 'active' : '' ?>">
             <i class="fa-solid fa-ticket"></i> Sự kiện
         </a>
+        <!-- <a href="../services/search.php" class="nav-link <?= strpos($_SERVER['PHP_SELF'], 'search.php') !== false ? 'active' : '' ?>">
+            <i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+        </a> -->
 
         <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'artist'): ?>
             <div class="sidebar-divider"></div>

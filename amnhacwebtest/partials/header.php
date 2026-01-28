@@ -2,7 +2,10 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+$keyword = $_GET['q'] ?? '';
 ?>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -114,6 +117,25 @@ if (session_status() === PHP_SESSION_NONE) {
             position: relative;
         }
 
+        .search-icon {
+            position: absolute;
+            left: 390px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #000;
+            font-size: 18px;
+        }
+        .search-input {
+            width: 100%;
+            background: #fff;
+            border: none;
+            padding: 12px 48px;
+            border-radius: 500px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            color: #000;
+            outline: none;
+        }
         .user-menu {
             display: flex;
             align-items: center;
@@ -214,15 +236,21 @@ if (session_status() === PHP_SESSION_NONE) {
 
 <div class="app-container">
     <header class="top-nav">
-        <div class="nav-center">
-            <div class="search-container">
-                <form action="../services/search.php" method="GET">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" name="query" class="search-input" placeholder="Bạn muốn phát nội dung gì?">
-                </form>
-            </div>
-        </div>
 
+        <div>
+        <!-- thanh search nha -->   
+        <form method="GET" action="../services/search.php" class="search-form">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input 
+                type="text"
+                name="q"
+                class="search-input"
+                placeholder="Bạn muốn nghe gì?"
+                value="<?= htmlspecialchars($keyword) ?>"
+                required
+            >
+        </form>
+        </div>
         <div class="nav-right">
             <?php if (isset($_SESSION['user'])): ?>
                 <div class="user-container">

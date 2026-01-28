@@ -3,9 +3,14 @@ require_once '../config/database.php';
 
 $db = (new Database())->connect();
 $user_id = $_SESSION['user']['id'] ?? 0;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$conn = (new Database())->connect();
 
 /* =========================
-   DANH SÁCH BÀI HÁT (SIDEBAR)
+   DANH SÁCH BÀI HÁT
 ========================= */
 $sql = "
     SELECT
@@ -21,8 +26,7 @@ $sql = "
       AND s.is_deleted = 0
     ORDER BY s.created_at DESC
 ";
-$result = $db->query($sql);
-$songList = $result->fetch_all(MYSQLI_ASSOC);
+$songList = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
 /* =========================
    TRENDING SONGS
@@ -41,23 +45,37 @@ $sql = "
     ORDER BY s.created_at DESC
     LIMIT 5
 ";
-$result = $db->query($sql);
-$trendingSongs = $result->fetch_all(MYSQLI_ASSOC);
+$trendingSongs = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
 /* =========================
    POPULAR ARTISTS
 ========================= */
 $sql = "
-    SELECT
+    SELECT 
+        u.user_id,
         u.username,
+        u.avatar,
         COUNT(*) AS total_songs
     FROM songs s
     JOIN users u ON s.artist_id = u.user_id
     WHERE s.status = 'APPROVED'
-      AND s.is_deleted = 0
+    AND s.is_deleted = 0
     GROUP BY u.user_id
     ORDER BY total_songs DESC
     LIMIT 5
 ";
-$result = $db->query($sql);
-$popularArtists = $result->fetch_all(MYSQLI_ASSOC);
+$popularArtists = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+
+/* =========================
+   CURRENT SONG (PLAYER)
+========================= */
+if (isset($_GET['song_id'])) {
+    $songId = (int) $_GET['song_id'];
+
+    foreach ($songList as $song) {
+        if ((int)$song['song_id'] === $songId) {
+            $_SESSION['current_song'] = $song;
+            break;
+        }
+    }
+}
