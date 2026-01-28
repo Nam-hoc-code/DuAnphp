@@ -123,6 +123,15 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <span>Thêm sự kiện</span>
             </a>
         </li>
+
+        <li class="nav-item">
+            <!-- Menu Thêm sự kiện -->
+            <a href="../admin/admin_log.php" class="nav-link" >
+                <i class="fas fa-calendar-plus"></i>
+                <span>Nhật ký duyệt</span>
+            </a>
+        </li>
+
         <li class="nav-item">
             <!-- Nút đăng xuất -->
             <a href="../auth/logout.php" class="nav-link logout-btn">

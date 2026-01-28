@@ -119,7 +119,7 @@ $keyword = $_GET['q'] ?? '';
 
         .search-icon {
             position: absolute;
-            left: 390px;
+            left: 46px;
             top: 50%;
             transform: translateY(-50%);
             color: #000;
@@ -263,7 +263,7 @@ $keyword = $_GET['q'] ?? '';
                     </div>
                     
                     <div class="dropdown-menu" id="userMenuDropdown">
-                        <a href="profile.php" class="dropdown-item">Tài khoản</a>
+                        <a href="../page/user_info.php" class="dropdown-item">Tài khoản</a>
                         <hr class="dropdown-divider">
                         <a href="../auth/logout.php" class="dropdown-item" style="color: var(--logout-red);">Đăng xuất</a>
                     </div>
