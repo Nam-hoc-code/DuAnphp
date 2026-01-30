@@ -1,4 +1,6 @@
 <?php
+
+
 require_once '../config/database.php';
 require_once '../auth/check_login.php';
 require_once '../partials/header.php';
@@ -14,13 +16,17 @@ $conn = $db->connect();
 $sql = "
     SELECT 
         d.disc_id,
+        d.disc_title,
+        d.disc_image,
         d.price,
-        s.title,
-        s.cover_image,
+        d.description,
+        COUNT(DISTINCT dd.song_id) AS song_count,
         u.username AS artist_name
     FROM discs d
-    JOIN songs s ON d.song_id = s.song_id
-    JOIN users u ON s.artist_id = u.user_id
+    LEFT JOIN disc_details dd ON d.disc_id = dd.disc_id
+    JOIN users u ON d.artist_id = u.user_id
+    WHERE d.is_deleted = 0
+    GROUP BY d.disc_id
     ORDER BY d.disc_id DESC
 ";
 
@@ -59,6 +65,7 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         align-items: center;
         gap: 8px;
         transition: transform 0.2s;
+        text-decoration: none;
     }
     .cart-link:hover { transform: scale(1.05); } /* Hiệu ứng phóng to nhẹ khi di chuột */
 
@@ -75,8 +82,21 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         border-radius: 8px;
         transition: background 0.3s;
         border: 1px solid #282828;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        cursor: pointer;
     }
     .disc-card:hover { background: #282828; } /* Đổi màu nền sáng hơn khi hover */
+
+    /* Link bọc card */
+    .disc-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
 
     /* Hiệu ứng đổ bóng cho ảnh đĩa */
     .disc-img-wrapper {
@@ -84,6 +104,7 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         padding-bottom: 100%; /* Giữ tỉ lệ khung hình vuông 1:1 */
         margin-bottom: 16px;
         box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        overflow: hidden;
     }
 
     .disc-img {
@@ -101,9 +122,31 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        color: #fff;
     }
 
-    .disc-artist { color: var(--text-sub); font-size: 14px; margin-bottom: 12px; }
+    .disc-artist { color: var(--text-sub); font-size: 14px; margin-bottom: 4px; }
+
+    .disc-songs { 
+        color: var(--text-sub); 
+        font-size: 13px; 
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .disc-description {
+        color: var(--text-sub);
+        font-size: 12px;
+        margin-bottom: 12px;
+        line-height: 1.4;
+        flex-grow: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 
     .disc-price {
         font-size: 1.2rem;
@@ -113,8 +156,14 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         display: block;
     }
 
+    .disc-card-footer {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+    }
+
     .btn-buy {
-        width: 100%;
+        flex: 1;
         background: var(--spotify-green);
         color: #000;
         border: none;
@@ -129,6 +178,19 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
         gap: 8px;
     }
     .btn-buy:hover { background: #1ed760; }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 40px;
+        color: var(--text-sub);
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        display: block;
+        opacity: 0.5;
+    }
 </style>
 
 <main class="disc-content">
@@ -143,20 +205,36 @@ $discList = $result->fetch_all(MYSQLI_ASSOC);
     </div>
 
     <?php if (empty($discList)): ?>
-        <p style="text-align:center; color: var(--text-sub); padding: 40px;">Hiện chưa có đĩa nào được bán.</p>
+        <div class="empty-state">
+            <i class="fa-solid fa-compact-disc"></i>
+            <p>Hiện chưa có đĩa nào được bán.</p>
+        </div>
     <?php else: ?>
         <div class="disc-grid">
             <?php foreach ($discList as $disc): ?>
             <div class="disc-card">
-                <div class="disc-img-wrapper">
-                    <img src="<?= htmlspecialchars($disc['cover_image'] ?? '../assets/images/default-cover.png') ?>" class="disc-img">
-                </div>
-                <div class="disc-title"><?= htmlspecialchars($disc['title']) ?></div>
-                <div class="disc-artist"><?= htmlspecialchars($disc['artist_name']) ?></div>
-                <span class="disc-price"><?= number_format($disc['price']) ?> VNĐ</span>
-                <form action="add_to_cart.php" method="POST">
+                <a href="../page/disc_info.php?disc_id=<?= $disc['disc_id'] ?>" class="disc-card-link">
+                    <div class="disc-img-wrapper">
+                        <img src="<?= htmlspecialchars($disc['disc_image'] ? '../uploads/disc_images/' . $disc['disc_image'] : '../assets/images/default-cover.png') ?>" 
+                             alt="<?= htmlspecialchars($disc['disc_title']) ?>"
+                             class="disc-img"
+                             onerror="this.src='../assets/images/default-cover.png'">
+                    </div>
+                    <div class="disc-title"><?= htmlspecialchars($disc['disc_title']) ?></div>
+                    <div class="disc-artist">🎤 <?= htmlspecialchars($disc['artist_name']) ?></div>
+                    <div class="disc-songs">
+                        <i class="fa-solid fa-music"></i>
+                        <?= $disc['song_count'] ?> bài hát
+                    </div>
+                    <?php if (!empty($disc['description'])): ?>
+                        <div class="disc-description"><?= htmlspecialchars($disc['description']) ?></div>
+                    <?php endif; ?>
+                    <span class="disc-price"><?= number_format($disc['price']) ?> VNĐ</span>
+                </a>
+                
+                <form action="add_to_cart.php" method="POST" class="disc-card-footer" onclick="event.stopPropagation();">
                     <input type="hidden" name="disc_id" value="<?= $disc['disc_id'] ?>">
-                    <input type="hidden" name="title" value="<?= htmlspecialchars($disc['title']) ?>">
+                    <input type="hidden" name="title" value="<?= htmlspecialchars($disc['disc_title']) ?>">
                     <input type="hidden" name="price" value="<?= $disc['price'] ?>">
                     <button type="submit" class="btn-buy">
                         <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ

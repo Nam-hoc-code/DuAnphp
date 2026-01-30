@@ -2,7 +2,7 @@
 require_once "check_artist.php";
 require_once "../config/database.php";
 
-if (!isset($_SESSION['user']['id'])) {
+if (!isset($_SESSION['user']['user_id'])) {
     die("Chưa đăng nhập");
 }
 
@@ -11,7 +11,7 @@ if (!isset($_GET['id'])) {
 }
 
 $song_id   = (int) $_GET['id'];
-$artist_id = (int) $_SESSION['user']['id'];
+$artist_id = (int) $_SESSION['user']['user_id'];
 $admin_id  = 1; // admin duy nhất
 
 $db = new Database();

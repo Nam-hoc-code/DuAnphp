@@ -173,9 +173,7 @@ if ($result->num_rows === 1) {
 
         session_regenerate_id(true);
 
-        // ✅ Thêm user_id vào session
-        $_SESSION['user_id'] = $user['user_id'];
-        
+
         $_SESSION['user'] = [
             'user_id'  => $user['user_id'],
             'username' => $user['username'],

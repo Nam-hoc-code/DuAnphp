@@ -1,4 +1,5 @@
 <?php
+
 require_once "../config/database.php";
 require_once "../auth/check_login.php";
 
@@ -18,23 +19,33 @@ foreach ($_SESSION['cart'] as $item) {
     
     $disc_id = $item['disc_id'];
     $price   = $item['price'];
+    $qty     = $item['qty'] ?? 1;
 
-    // Lấy thông tin đĩa và hình ảnh bài hát từ DB
-    $sql = "SELECT s.title, s.cover_image 
-            FROM discs d 
-            JOIN songs s ON d.song_id = s.song_id
-            WHERE d.disc_id = ?";
+  // Lấy thông tin đĩa từ bảng discs
+    $sql = "SELECT disc_title, disc_image FROM discs WHERE disc_id = ?";
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("Prepare failed: " . $conn->error);
+    }
     $stmt->bind_param("i", $disc_id);
     $stmt->execute();
     $disc = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
 
-    $total += $price;
+    if (!$disc) {
+        continue;
+    }
+
+    $item_total = $price * $qty;
+    $total += $item_total;
 
     $cart_items[] = [
-        'name'  => $disc['title'],
-        'image' => $disc['cover_image'],  // Sử dụng cover_image thay vì image_path
-        'price' => $price
+        'disc_id' => $disc_id,
+        'name'    => $disc['disc_title'],
+        'image'   => $disc['disc_image'],
+        'price'   => $price,
+        'qty'     => $qty,
+        'subtotal' => $item_total
     ];
 }
 
@@ -149,11 +160,22 @@ include "../partials/sidebar.php";
 
     .item-info { flex: 1; }
     .item-name { font-weight: 600; font-size: 14px; display: block; }
-    .item-price { color: var(--text-sub); font-size: 13px; }
+    .item-meta { color: var(--text-sub); font-size: 12px; }
+    .item-price { color: var(--spotify-green); font-weight: 600; font-size: 13px; margin-top: 4px; }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        font-size: 14px;
+        color: var(--text-sub);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
 
     .summary-total {
-        margin-top: 24px;
-        padding-top: 20px;
+        margin-top: 16px;
+        padding-top: 16px;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         justify-content: space-between;
@@ -226,15 +248,50 @@ include "../partials/sidebar.php";
                 <h2 class="section-title"><i class="fa-solid fa-receipt"></i> Tóm tắt đơn hàng</h2>
                 <ul class="order-items">
                     <?php foreach ($cart_items as $item): ?>
+                        <?php
+                            // Xây dựng đường dẫn hình ảnh từ thư mục uploads hoặc assets
+                            $image_file = $item['image'];
+                            // Kiểm tra xem file có tồn tại không
+                            $possible_paths = [
+                                '../uploads/discs/' . $image_file,
+                                '../assets/images/discs/' . $image_file,
+                                'uploads/discs/' . $image_file,
+                                'assets/images/discs/' . $image_file
+                            ];
+                            
+                            $image_path = null;
+                            foreach ($possible_paths as $path) {
+                                if (file_exists($path)) {
+                                    $image_path = $path;
+                                    break;
+                                }
+                            }
+                            
+                            // Nếu không tìm thấy, dùng placeholder đơn giản
+                            if (!$image_path) {
+                                $image_path = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect fill=%22%23444%22 width=%2248%22 height=%2248%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2212%22%3ENo Image%3C/text%3E%3C/svg%3E';
+                            }
+                        ?>
                         <li class="order-item">
-                            <img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" onerror="this.src='https://via.placeholder.com/48?text=No+Image'">
+                            <img src="<?= htmlspecialchars($image_path) ?>" 
+                                 alt="<?= htmlspecialchars($item['name']) ?>"
+                                 style="width:48px; height:48px; border-radius:4px; object-fit:cover; background:#333;">
                             <div class="item-info">
                                 <span class="item-name"><?= htmlspecialchars($item['name']) ?></span>
-                                <span class="item-price"><?= number_format($item['price']) ?>đ</span>
+                                <span class="item-meta">SL: <?= $item['qty'] ?></span>
+                                <span class="item-price"><?= number_format($item['subtotal']) ?>đ</span>
                             </div>
                         </li>
                     <?php endforeach; ?>
-                </ul>
+                </ul>                <div class="summary-row">
+                    <span>Tạm tính:</span>
+                    <span><?= number_format($total) ?>đ</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Phí vận chuyển:</span>
+                    <span style="color: var(--spotify-green);">Miễn phí</span>
+                </div>
 
                 <div class="summary-total">
                     <span class="total-label">Tổng cộng:</span>

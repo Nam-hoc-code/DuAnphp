@@ -1,12 +1,11 @@
 <?php
-
 require_once "check_artist.php";
 require_once "../config/database.php";
 
 $db = new Database();
 $conn = $db->connect();
 
-$artist_id = $_SESSION['user']['id']; // chắc chắn đã tồn tại
+$artist_id = $_SESSION['user']['user_id']; 
 
 // Tổng bài hát
 $sql1 = "SELECT COUNT(*) AS total FROM songs WHERE artist_id = ? AND is_deleted = 0";

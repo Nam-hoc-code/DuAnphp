@@ -13,6 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // Lấy danh sách sản phẩm từ session 'cart', nếu không có thì mặc định là mảng rỗng
 $cart = $_SESSION['cart'] ?? [];
 $total = 0; // Biến tính tổng tiền
+$totalQty = 0; // biến số lượng sàn phẩm
 ?>
 
 <style>
@@ -236,16 +237,21 @@ $total = 0; // Biến tính tổng tiền
             <!-- Phần danh sách sản phẩm (Bên trái) -->
             <div class="cart-table-container">
                 <table class="cart-table">
-                    <thead>
+     <thead>
                         <tr>
                             <th>Sản phẩm</th>
                             <th>Giá niêm yết</th>
+                            <th>Số lượng</th>
                             <th style="width: 50px;"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($cart as $item): ?>
-                            <?php $total += $item['price']; // Cộng dồn tổng tiền ?>
+                            <?php
+                                $qty = $item['qty'] ?? 1; // nếu chưa có qty mặc định 1
+                                $total += $item['price'] * $qty; // Cộng dồn tổng tiền theo số lượng
+                                $totalQty += $qty;
+                            ?>
                             <tr>
                                 <td>
                                     <div class="item-info">
@@ -258,9 +264,18 @@ $total = 0; // Biến tính tổng tiền
                                         </div>
                                     </div>
                                 </td>
-                                <td class="price-cell"><?= number_format($item['price']) ?> VNĐ</td>
+                                <td class="price-cell" data-price="<?= $item['price'] ?>"><?= number_format($item['price']) ?> VNĐ</td>
+
+                                <!-- Số lượng với nút tăng/giảm -->
+                                <td class="quantity-cell">
+                                    <div class="qty-controls" style="display:flex;align-items:center;gap:8px;">
+                                        <button type="button" class="qty-decrease" data-disc="<?= $item['disc_id'] ?>">−</button>
+                                        <input type="number" min="1" class="qty-input" data-price="<?= $item['price'] ?>" data-disc="<?= $item['disc_id'] ?>" value="<?= $qty ?>" style="width:60px;text-align:center;">
+                                        <button type="button" class="qty-increase" data-disc="<?= $item['disc_id'] ?>">+</button>
+                                    </div>
+                                </td>
+
                                 <td>
-                                    <!-- Nút xóa sản phẩm khỏi giỏ dựa trên ID -->
                                     <a href="remove_from_cart.php?disc_id=<?= $item['disc_id'] ?>" class="remove-btn" title="Xóa khỏi giỏ hàng">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </a>
@@ -276,7 +291,8 @@ $total = 0; // Biến tính tổng tiền
                 <h3 class="summary-title">Tóm tắt đơn hàng</h3>
                 <div class="summary-row">
                     <span>Số lượng sản phẩm:</span>
-                    <span><?= count($cart) ?></span>
+                    <!-- Hiển thị tổng số lượng (tính theo qty) -->
+                    <span id="total-qty"><?= $totalQty ?></span>
                 </div>
                 <div class="summary-row">
                     <span>Phí vận chuyển:</span>
@@ -285,7 +301,7 @@ $total = 0; // Biến tính tổng tiền
                 <!-- Tổng số tiền cần thanh toán -->
                 <div class="summary-total">
                     <span>Tổng cộng:</span>
-                    <span><?= number_format($total) ?> VNĐ</span>
+                    <span id="total-price"><?= number_format($total) ?> VNĐ</span>
                 </div>
 
                 <!-- Form gửi yêu cầu thanh toán -->
@@ -303,4 +319,80 @@ $total = 0; // Biến tính tổng tiền
     <?php endif; ?>
 </main>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const totalQtyEl = document.getElementById('total-qty');
+  const totalPriceEl = document.getElementById('total-price');
+
+  function recalcAndRender() {
+    let totalQty = 0;
+    let totalPrice = 0;
+    document.querySelectorAll('.qty-input').forEach(input => {
+      const qty = Math.max(1, parseInt(input.value, 10) || 1);
+      const price = parseFloat(input.dataset.price) || 0;
+      totalQty += qty;
+      totalPrice += price * qty;
+      input.value = qty;
+    });
+
+    totalQtyEl.textContent = totalQty;
+    totalPriceEl.textContent = new Intl.NumberFormat('vi-VN').format(totalPrice) + ' VNĐ';
+  }
+
+  // Gửi update lên server
+  function updateCartOnServer(disc_id, qty) {
+    fetch('update_cart.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ disc_id: disc_id, qty: qty })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) console.warn(data.message);
+    })
+    .catch(err => console.error('Lỗi:', err));
+  }
+
+  // Gắn sự kiện cho nút + / -
+  document.addEventListener('click', function (e) {
+    if (e.target.matches('.qty-increase') || e.target.closest('.qty-increase')) {
+      const btn = e.target.matches('.qty-increase') ? e.target : e.target.closest('.qty-increase');
+      const disc = btn.dataset.disc;
+      const input = document.querySelector('.qty-input[data-disc="'+disc+'"]');
+      if (input) {
+        input.value = parseInt(input.value || 0, 10) + 1;
+        updateCartOnServer(disc, input.value);
+        recalcAndRender();
+      }
+    }
+    if (e.target.matches('.qty-decrease') || e.target.closest('.qty-decrease')) {
+      const btn = e.target.matches('.qty-decrease') ? e.target : e.target.closest('.qty-decrease');
+      const disc = btn.dataset.disc;
+      const input = document.querySelector('.qty-input[data-disc="'+disc+'"]');
+      if (input) {
+        input.value = Math.max(1, parseInt(input.value || 1, 10) - 1);
+        updateCartOnServer(disc, input.value);
+        recalcAndRender();
+      }
+    }
+  });
+
+  // Khi thay đổi trực tiếp trong input
+  document.querySelectorAll('.qty-input').forEach(input => {
+    input.addEventListener('change', () => {
+      input.value = Math.max(1, parseInt(input.value || 1, 10));
+      updateCartOnServer(input.dataset.disc, input.value);
+      recalcAndRender();
+    });
+    input.addEventListener('input', () => {
+      if (input.value === '') return;
+      input.value = Math.max(1, parseInt(input.value || 1, 10));
+    });
+  });
+
+  recalcAndRender();
+});
+</script>
+
 <?php require_once '../partials/player.php'; ?>
+

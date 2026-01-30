@@ -11,7 +11,7 @@ if (!isset($_POST['fav_id'])) {
 }
 
 $fav_id  = (int)$_POST['fav_id'];
-$user_id = $_SESSION['user']['id']; // ✅ ĐÚNG SESSION
+$user_id = $_SESSION['user']['user_id']; // ✅ ĐÚNG SESSION
 
 $db = new Database();
 $conn = $db->connect(); // ✅ TẠO KẾT NỐI mysqli

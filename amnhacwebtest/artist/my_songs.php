@@ -1,10 +1,17 @@
 <?php
+session_start();
 require_once "check_artist.php";
 require_once "../config/database.php";
 
+// // Kiểm tra session tồn tại
+// if (!isset($_SESSION['user']['id'])) {
+//     header("Location: ../auth/login_form.php");
+//     exit();
+// }
+
 $db = new Database();
 $conn = $db->connect();
-$artist_id = $_SESSION['user']['id'];
+$artist_id = $_SESSION['user']['user_id'];
 
 $sql = "SELECT * FROM songs WHERE artist_id = ? AND is_deleted = 0 ORDER BY created_at DESC";
 $stmt = $conn->prepare($sql);

@@ -4,7 +4,7 @@ require_once '../config/database.php';
 require_once '../partials/header.php';
 require_once '../partials/sidebar.php';
 
-$userId = $_SESSION['user_id'] ?? null;
+$userId = $_SESSION['user']['user_id'] ?? null;
 if (!$userId) {
     
     die('Chưa đăng nhập');

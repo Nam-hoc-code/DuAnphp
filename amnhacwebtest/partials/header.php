@@ -42,7 +42,7 @@ $keyword = $_GET['q'] ?? '';
 
         .app-container {
             display: flex;
-            min-height: 100vh;
+            min-height: 100vh;  
         }
 
         .top-nav {

@@ -347,11 +347,11 @@ $defaultCover = '../assets/images/default-cover.png';
             <div class="slide">
                 <img src="../assets/img/anh-son-tung-mtp-10.jpg" class="slide-img" alt="Âm thầm bên em">
                 <div class="slide-content">
-                    <div class="slide-tag">Thịnh hành</div>
-                    <h1 class="slide-title">Âm Thầm Bên Em</h1>
+                    <div class="slide-tag">Đề xuất</div>
+                    <h1 class="slide-title">Cơn Mưa Xa Dần</h1>
                     <p class="slide-desc">Một bản hít đình đám mang đậm phong cách Sơn Tùng M-TP.</p>
                     <div class="btn-wrap">
-                        <a href="#" class="btn-play-now">Nghe ngay</a>
+                        <a href="home.php?song_id=9" class="btn-play-now">Nghe ngay</a>
                     </div>
                 </div>
             </div>
@@ -360,22 +360,22 @@ $defaultCover = '../assets/images/default-cover.png';
                 <img src="../assets/img/anh-son-tung-mtp-12.jpg" class="slide-img" alt="Buông đôi tay nhau ra">
                 <div class="slide-content">
                     <div class="slide-tag">Đề xuất</div>
-                    <h1 class="slide-title">Buông Đôi Tay Nhau Ra</h1>
+                    <h1 class="slide-title">Mong Năm Mới Trải Hoa</h1>
                     <p class="slide-desc">Cùng thưởng thức giai điệu bắt tai và ca từ ý nghĩa.</p>
                     <div class="btn-wrap">
-                        <a href="#" class="btn-play-now">Nghe ngay</a>
+                        <a href="homepage?song_id=1" class="btn-play-now">Nghe ngay</a>
                     </div>
                 </div>
             </div>
             <!-- Slide 3 -->
             <div class="slide">
-                <img src="../assets/img/anh-son-tung-mtp-13.jpg" class="slide-img" alt="Phép màu">
+                <img src="../assets/img/phepmau.jpg" class="slide-img" alt="Phép màu">
                 <div class="slide-content">
-                    <div class="slide-tag">Mới phát hành</div>
+                    <div class="slide-tag">Đề xuất</div>
                     <h1 class="slide-title">Phép Màu</h1>
                     <p class="slide-desc">Giai điệu diệu kỳ xoa dịu tâm hồn bạn mỗi ngày.</p>
                     <div class="btn-wrap">
-                        <a href="#" class="btn-play-now">Nghe ngay</a>
+                        <a href="home.php?song_id=8" class="btn-play-now">Nghe ngay</a>
                     </div>
                 </div>
             </div>
@@ -384,10 +384,10 @@ $defaultCover = '../assets/images/default-cover.png';
                 <img src="../assets/img/sontungmtp.jpg" class="slide-img" alt="Mất kết nối">
                 <div class="slide-content">
                     <div class="slide-tag">Hot hit</div>
-                    <h1 class="slide-title">Mất Kết Nối</h1>
+                    <h1 class="slide-title">Muộn rồi mà sao còn</h1>
                     <p class="slide-desc">Đừng để âm nhạc của bạn bị gián đoạn, hãy nghe ngay!</p>
                     <div class="btn-wrap">
-                        <a href="#" class="btn-play-now">Nghe ngay</a>
+                        <a href="homepage?song_id=10" class="btn-play-now">Nghe ngay</a>
                     </div>
                 </div>
             </div>

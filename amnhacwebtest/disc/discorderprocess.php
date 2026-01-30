@@ -6,7 +6,7 @@ if (empty($_SESSION['cart'])) {
     die("Giỏ hàng trống");
 }
 
-$user_id = $_SESSION['user']['id'];
+$user_id = $_SESSION['user']['user_id'];
 
 // ✅ ĐÚNG TÊN FIELD TỪ FORM
 $receiver_name    = $_POST['receiver_name'];

@@ -2,7 +2,7 @@
 require_once '../config/database.php';
 
 $db = (new Database())->connect();
-$user_id = $_SESSION['user']['id'] ?? 0;
+$user_id = $_SESSION['user']['user_id'] ?? 0;
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

@@ -6,31 +6,30 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['user']['id'])) {
+if (!isset($_SESSION['user']['user_id'])) {
     die("Chưa đăng nhập");
 }
 
-$artist_id = (int) $_SESSION['user']['id'];
+$artist_id = (int) $_SESSION['user']['user_id'];
 
 $db = new Database();
 $conn = $db->connect();
 
 /* =========================
-   1️⃣ ĐƠN HÀNG ĐĨA
+   1️⃣ ĐƠN HÀNG ĐĨA (SỬA)
 ========================= */
 $sql_orders = "
     SELECT 
         o.order_id,
         u.username AS buyer,
-        s.title AS disc_name,
+        d.disc_title,
         d.price,
         o.status,
         o.created_at
     FROM disc_orders o
     JOIN discs d ON o.disc_id = d.disc_id
-    JOIN songs s ON d.song_id = s.song_id
     JOIN users u ON o.user_id = u.user_id
-    WHERE s.artist_id = ?
+    WHERE d.artist_id = ?
     ORDER BY o.created_at DESC
 ";
 $stmt = $conn->prepare($sql_orders);
@@ -45,6 +44,7 @@ $sql_songs = "
     SELECT song_id, title
     FROM songs
     WHERE artist_id = ? AND is_deleted = 0
+    ORDER BY title ASC
 ";
 $stmt_songs = $conn->prepare($sql_songs);
 $stmt_songs->bind_param("i", $artist_id);
@@ -52,21 +52,23 @@ $stmt_songs->execute();
 $result_songs = $stmt_songs->get_result();
 
 /* =========================
-   3️⃣ DISCS HIỆN CÓ
+   3️⃣ DISCS HIỆN CÓ (SỬA)
 ========================= */
 $sql_discs = "
     SELECT 
         d.disc_id,
-        s.title AS song_title,
+        d.disc_title,
         d.price,
+        COUNT(DISTINCT dd.song_id) AS song_count,
         (
             SELECT COUNT(*) 
             FROM disc_orders o 
             WHERE o.disc_id = d.disc_id
         ) AS order_count
     FROM discs d
-    JOIN songs s ON d.song_id = s.song_id
-    WHERE s.artist_id = ?
+    LEFT JOIN disc_details dd ON d.disc_id = dd.disc_id
+    WHERE d.artist_id = ? AND d.is_deleted = 0
+    GROUP BY d.disc_id
     ORDER BY d.disc_id DESC
 ";
 $stmt_discs = $conn->prepare($sql_discs);
@@ -233,7 +235,7 @@ $result_discs = $stmt_discs->get_result();
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-group label { font-size: 13px; font-weight: 600; color: var(--text-sub); }
         
-        select, input {
+        select, input, textarea {
             background: #282828;
             border: 1px solid transparent;
             color: #fff;
@@ -243,7 +245,7 @@ $result_discs = $stmt_discs->get_result();
             font-size: 14px;
             transition: border 0.3s;
         }
-        select:focus, input:focus { outline: none; border-color: var(--spotify-green); background: #333; }
+        select:focus, input:focus, textarea:focus { outline: none; border-color: var(--spotify-green); background: #333; }
 
         .empty-state {
             text-align: center;
@@ -267,7 +269,7 @@ $result_discs = $stmt_discs->get_result();
 
     <div class="nav-group">
         <a href="artist_view.php" class="nav-link"><i class="fa-solid fa-house"></i> Trang chủ</a>
-        <a href="my_songs.php" class="nav-link"><i class="fa-solid fa-music"></i> Duyệt bài hát</a>
+        <a href="my_songs.php" class="nav-link"><i class="fa-solid fa-music"></i> Bài hát</a>
         <a href="add_song.php" class="nav-link"><i class="fa-solid fa-circle-plus"></i> Thêm bài mới</a>
         <a href="oders.php" class="nav-link active"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</a>
         <a href="../auth/logout.php" class="nav-link logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
@@ -300,7 +302,7 @@ $result_discs = $stmt_discs->get_result();
             <?php while ($row = $result_orders->fetch_assoc()): ?>
                 <tr>
                     <td style="font-weight: 600; color: var(--spotify-green);">#<?= $row['order_id'] ?></td>
-                    <td style="font-weight: 600;"><?= htmlspecialchars($row['disc_name']) ?></td>
+                    <td style="font-weight: 600;"><?= htmlspecialchars($row['disc_title']) ?></td>
                     <td><?= htmlspecialchars($row['buyer']) ?></td>
                     <td style="font-weight: 600;"><?= number_format($row['price']) ?> VNĐ</td>
                     <td>
@@ -312,19 +314,19 @@ $result_discs = $stmt_discs->get_result();
                     <td style="color: var(--text-sub); font-size: 13px;"><?= date('H:i d/m/Y', strtotime($row['created_at'])) ?></td>
                     <td>
                         <?php if ($row['status'] === 'pending'): ?>
-                            <form method="POST" action="update_order_status.php">
+                            <form method="POST" action="update_order_status.php" style="display: inline;">
                                 <input type="hidden" name="order_id" value="<?= $row['order_id'] ?>">
                                 <input type="hidden" name="status" value="confirmed">
                                 <button class="btn"><i class="fa-solid fa-check"></i> Xác nhận</button>
                             </form>
                         <?php elseif ($row['status'] === 'confirmed'): ?>
-                            <form method="POST" action="update_order_status.php">
+                            <form method="POST" action="update_order_status.php" style="display: inline;">
                                 <input type="hidden" name="order_id" value="<?= $row['order_id'] ?>">
                                 <input type="hidden" name="status" value="shipping">
                                 <button class="btn" style="background: #00aaff; color: #fff;"><i class="fa-solid fa-truck"></i> Giao hàng</button>
                             </form>
                         <?php elseif ($row['status'] === 'shipping'): ?>
-                            <form method="POST" action="update_order_status.php">
+                            <form method="POST" action="update_order_status.php" style="display: inline;">
                                 <input type="hidden" name="order_id" value="<?= $row['order_id'] ?>">
                                 <input type="hidden" name="status" value="done">
                                 <button class="btn"><i class="fa-solid fa-circle-check"></i> Hoàn tất</button>
@@ -346,34 +348,96 @@ $result_discs = $stmt_discs->get_result();
     </div>
 
     <!-- =======================
-         THÊM ĐĨA
+         THÊM ĐĨA MỚI
     ======================= -->
     <h2><i class="fa-solid fa-circle-plus"></i> Thêm đĩa mới</h2>
     
     <div class="content-card">
-        <form action="add_disc_process.php" method="POST" class="form-grid">
-            <div class="form-group">
-                <label>Chọn bài hát:</label>
-                <select name="song_id" required>
-                    <option value="" disabled selected>-- Chọn bài hát --</option>
-                    <?php while ($song = $result_songs->fetch_assoc()): ?>
-                        <option value="<?= $song['song_id'] ?>">
-                            <?= htmlspecialchars($song['title']) ?>
-                        </option>
+        <form action="add_disc_process.php" method="POST" enctype="multipart/form-data">
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                <!-- Tên đĩa -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-circle-info" style="color: var(--spotify-green); margin-right: 5px;"></i>Tên đĩa:</label>
+                    <input type="text" name="disc_title" placeholder="VD: Album Nhạc Tình 2025" required>
+                </div>
+
+                <!-- Giá bán -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-coins" style="color: #ffd700; margin-right: 5px;"></i>Giá bán (VNĐ):</label>
+                    <input type="number" name="price" min="10000" step="1000" placeholder="VD: 50000" required>
+                </div>
+
+                <!-- Upload hình ảnh -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-image" style="color: #00aaff; margin-right: 5px;"></i>Hình ảnh đĩa:</label>
+                    <input type="file" name="disc_image" accept="image/jpeg,image/png,image/gif" required>
+                    <small style="color: var(--text-sub); margin-top: 5px; display: block;">Định dạng: JPG, PNG, GIF (Max 5MB)</small>
+                </div>
+            </div>
+
+            <!-- Mô tả đĩa -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label><i class="fa-solid fa-pen" style="color: #ff9800; margin-right: 5px;"></i>Mô tả đĩa:</label>
+                <textarea name="description" placeholder="Mô tả về đĩa của bạn..." rows="4"></textarea>
+            </div>
+
+            <!-- Chọn bài hát -->
+            <div style="background: rgba(29, 185, 84, 0.1); border-radius: 8px; padding: 16px; margin-bottom: 20px; border: 1px solid rgba(29, 185, 84, 0.2);">
+                <h3 style="color: var(--spotify-green); margin: 0 0 15px 0; font-size: 15px;">
+                    <i class="fa-solid fa-music" style="margin-right: 8px;"></i>Chọn bài hát cho đĩa
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; max-height: 300px; overflow-y: auto; padding-right: 10px;">
+                    <?php 
+                    // Reset pointer để có thể loop lại
+                    $result_songs->data_seek(0);
+                    $count = 0;
+                    while ($song = $result_songs->fetch_assoc()): 
+                        $count++;
+                    ?>
+                        <label style="
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            padding: 10px;
+                            background: #1a1a1a;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            border: 1px solid #282828;
+                            transition: all 0.2s;
+                        " onmouseover="this.style.borderColor='var(--spotify-green)'" onmouseout="this.style.borderColor='#282828'">
+                            <input type="checkbox" name="songs[]" value="<?= $song['song_id'] ?>" style="
+                                width: 18px;
+                                height: 18px;
+                                cursor: pointer;
+                                accent-color: var(--spotify-green);
+                            ">
+                            <span style="font-size: 13px; color: var(--text-main); flex: 1;">
+                                <?= htmlspecialchars($song['title']) ?>
+                            </span>
+                        </label>
                     <?php endwhile; ?>
-                </select>
+                </div>
+
+                <?php if ($count == 0): ?>
+                    <p style="color: var(--logout-red); text-align: center; margin: 20px 0;">
+                        <i class="fa-solid fa-exclamation-circle"></i> Bạn chưa có bài hát nào. 
+                        <a href="add_song.php" style="color: var(--spotify-green); text-decoration: none;">Thêm bài hát trước</a>
+                    </p>
+                <?php endif; ?>
             </div>
 
-            <div class="form-group">
-                <label>Giá bán (VNĐ):</label>
-                <input type="number" name="price" min="1000" placeholder="VD: 50000" required>
-            </div>
-
-            <div class="form-group">
-                <button class="btn" style="height: 45px; padding: 0 30px; justify-content: center;">
-                    <i class="fa-solid fa-plus"></i> Tạo đĩa ngay
+            <!-- Nút Submit -->
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="reset" class="btn" style="background: #555; color: #fff;">
+                    <i class="fa-solid fa-rotate-left"></i> Làm lại
+                </button>
+                <button type="submit" class="btn" style="height: 45px; padding: 0 30px;">
+                    <i class="fa-solid fa-check"></i> Tạo đĩa
                 </button>
             </div>
+
         </form>
     </div>
 
@@ -387,7 +451,8 @@ $result_discs = $stmt_discs->get_result();
         <table>
             <thead>
                 <tr>
-                    <th>Bài hát</th>
+                    <th>Tên đĩa</th>
+                    <th>Số bài hát</th>
                     <th>Giá niêm yết</th>
                     <th>Số lượt đặt</th>
                     <th>Trạng thái</th>
@@ -398,8 +463,12 @@ $result_discs = $stmt_discs->get_result();
             <?php while ($row = $result_discs->fetch_assoc()): ?>
                 <tr>
                     <td style="font-weight: 600; font-size: 15px;">
-                        <i class="fa-solid fa-music" style="margin-right: 10px; color: var(--spotify-green);"></i>
-                        <?= htmlspecialchars($row['song_title']) ?>
+                        <i class="fa-solid fa-compact-disc" style="margin-right: 10px; color: var(--spotify-green);"></i>
+                        <?= htmlspecialchars($row['disc_title']) ?>
+                    </td>
+                    <td style="color: var(--text-sub);">
+                        <i class="fa-solid fa-music" style="margin-right: 5px;"></i>
+                        <?= $row['song_count'] ?> bài
                     </td>
                     <td style="font-weight: 600;"><?= number_format($row['price']) ?> VNĐ</td>
                     <td>
@@ -418,12 +487,12 @@ $result_discs = $stmt_discs->get_result();
                     </td>
                     <td>
                         <?php if ($row['order_count'] == 0): ?>
-                            <form action="delete_disc.php" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đĩa này?')">
+                            <form action="delete_disc.php" method="POST" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đĩa này?')">
                                 <input type="hidden" name="disc_id" value="<?= $row['disc_id'] ?>">
                                 <button class="btn btn-danger"><i class="fa-solid fa-trash-can"></i> Xóa</button>
                             </form>
                         <?php else: ?>
-                            <span style="color: var(--text-sub); font-size: 12px;">Không thể xóa khi có đơn hàng</span>
+                            <span style="color: var(--text-sub); font-size: 12px;">Không thể xóa</span>
                         <?php endif; ?>
                     </td>
                 </tr>

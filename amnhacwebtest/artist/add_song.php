@@ -148,7 +148,7 @@
 
     <div class="nav-group">
         <a href="artist_view.php" class="nav-link"><i class="fa-solid fa-house"></i> Trang chủ</a>
-        <a href="my_songs.php" class="nav-link"><i class="fa-solid fa-music"></i> Duyệt bài hát</a>
+        <a href="my_songs.php" class="nav-link"><i class="fa-solid fa-music"></i> Bài hát</a>
         <a href="add_song.php" class="nav-link active"><i class="fa-solid fa-circle-plus"></i> Thêm bài mới</a>
         <a href="oders.php" class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</a>
         <a href="../auth/logout.php" class="nav-link logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
