@@ -125,7 +125,7 @@ $defaultCover = '../assets/images/default-cover.png';
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
-        overflow: hidden;
+overflow: hidden;
     }
 
     .list-container {
@@ -254,7 +254,7 @@ $defaultCover = '../assets/images/default-cover.png';
         font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
-        background: var(--spotify-green);
+background: var(--spotify-green);
         color: #000;
         padding: 4px 12px;
         border-radius: 40px;
@@ -362,7 +362,7 @@ $defaultCover = '../assets/images/default-cover.png';
                     <div class="slide-tag">Đề xuất</div>
                     <h1 class="slide-title">Mong Năm Mới Trải Hoa</h1>
                     <p class="slide-desc">Cùng thưởng thức giai điệu bắt tai và ca từ ý nghĩa.</p>
-                    <div class="btn-wrap">
+<div class="btn-wrap">
                         <a href="homepage?song_id=1" class="btn-play-now">Nghe ngay</a>
                     </div>
                 </div>
@@ -422,7 +422,7 @@ $defaultCover = '../assets/images/default-cover.png';
                     <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         <?= htmlspecialchars($song['artist_name'] ?? 'Nghệ sĩ') ?>
                     </span>
-                    <button class="fav-btn <?= ($song['is_favorite'] > 0) ? 'active' : '' ?>" 
+<button class="fav-btn <?= ($song['is_favorite'] > 0) ? 'active' : '' ?>" 
                             onclick="toggleFavorite(event, <?= $song['song_id'] ?>, this)" 
                             title="<?= ($song['is_favorite'] > 0) ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích' ?>">
                         <i class="<?= ($song['is_favorite'] > 0) ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
@@ -469,14 +469,18 @@ $defaultCover = '../assets/images/default-cover.png';
                 style="text-decoration:none;color:inherit;">
                     
                     <div class="artist-card">
-                        <div class="artist-img" 
-                            style="background:#282828;display:flex;align-items:center;justify-content:center;">
-                            <i class="fa-solid fa-user" style="font-size:48px;color:#535353;"></i>
-                        </div>
+                        <?php if (!empty($artist['avatar'])): ?>
+                            <img src="../<?= htmlspecialchars($artist['avatar']) ?>" class="artist-img" alt="<?= htmlspecialchars($artist['username']) ?>">
+                        <?php else: ?>
+                            <div class="artist-img" 
+                                style="background:#282828;display:flex;align-items:center;justify-content:center;">
+                                <i class="fa-solid fa-user" style="font-size:48px;color:#535353;"></i>
+                            </div>
+                        <?php endif; ?>
 
                         <div style="font-weight:700;margin-bottom:4px;">
                             <?= htmlspecialchars($artist['username']) ?>
-                        </div>
+</div>
 
                         <div style="font-size:13px;color:var(--text-sub);">
                             Nghệ sĩ

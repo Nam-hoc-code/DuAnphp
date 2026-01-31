@@ -1,39 +1,46 @@
 <?php
-require_once "config/database.php";
+require_once '../auth/check_login.php';
 
-$db = new Database();
-$conn = $db->connect();
+$page = $_GET['page'] ?? 'home';
 
-$sql = "SELECT title, artist, file_path 
-        FROM songs 
-        WHERE is_deleted = 0";
+$allowPages = [
+    'home',
+    'profile',
+    'notifications',
+    'song_detail'
+];
 
-$result = $conn->query($sql);
+if (!in_array($page, $allowPages)) {
+    $page = 'home';
+}
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Nghe nhạc đơn giản</title>
+    <title>User</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 
-<h2>Danh sách bài hát</h2>
+<?php require_once '../partials/header.php'; ?>
 
-<?php while ($song = $result->fetch_assoc()) { ?>
-    <p>
-        <strong><?= $song['title'] ?></strong> - <?= $song['artist'] ?>
-    </p>
+<div class="main-wrapper">
 
-    <audio controls>
-        <source src="<?= $song['file_path'] ?>" type="audio/mpeg">
-        Trình duyệt không hỗ trợ audio
-    </audio>
+    <?php require_once '../partials/sidebar.php'; ?>
 
-    <hr>
-<?php }
-?>
+    <div class="main-content" id="mainContent">
+
+        <?php
+        $file = __DIR__ . '/' . $page . '.php';
+        require $file;
+        ?>
+
+    </div>
+
+</div>
+
+<?php require_once '../partials/player.php'; ?>
 
 </body>
 </html>
