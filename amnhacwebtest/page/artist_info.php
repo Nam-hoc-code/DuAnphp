@@ -116,6 +116,7 @@ $artistAvatar = !empty($artist['avatar']) ? '../' . $artist['avatar'] : $default
         min-height: 100vh;
         background: #121212;
         padding-bottom: 100px;
+        padding-right: 440px;
     }
 
     .artist-hero {
@@ -129,6 +130,7 @@ $artistAvatar = !empty($artist['avatar']) ? '../' . $artist['avatar'] : $default
         background-size: cover;
         background-position: center 20%;
         color: #fff;
+        width: 625px;
     }
 
     .artist-hero::before {
@@ -394,9 +396,9 @@ $artistAvatar = !empty($artist['avatar']) ? '../' . $artist['avatar'] : $default
                 Verified Artist
             </div>
             <h1 class="artist-name"><?= htmlspecialchars($artist['username']) ?></h1>
-            <div class="listener-count">
+            <!-- <div class="listener-count">
                 <?= number_format(rand(600000, 700000)) ?> monthly listeners
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -406,14 +408,14 @@ $artistAvatar = !empty($artist['avatar']) ? '../' . $artist['avatar'] : $default
             <i class="fa-solid fa-play"></i>
         </button>
         <button class="icon-btn heart-btn" onclick="toggleArtistFavorite(this)" data-artist-id="<?= $artistId ?>">
-            <i class="fa-regular fa-heart"></i>
+            <!-- <i class="fa-regular fa-heart"></i> -->
         </button>
         <button class="icon-btn">
-            <i class="fa-solid fa-shuffle"></i>
+            <!-- <i class="fa-solid fa-shuffle"></i> -->
         </button>
-        <button class="btn-follow">Follow</button>
+        <!-- <button class="btn-follow">Follow</button> -->
         <button class="icon-btn">
-            <i class="fa-solid fa-ellipsis"></i>
+            <!-- <i class="fa-solid fa-ellipsis"></i> -->
         </button>
     </div>
 

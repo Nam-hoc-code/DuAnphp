@@ -76,7 +76,7 @@ $songs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             display: flex;
             align-items: flex-end;
             gap: 24px;
-            padding: 80px 475px 24px; /* Reduced padding from 450px to 32px to fix 'narrow frame' */
+            padding: 80px 700px 24px 120px; /* Reduced padding from 450px to 32px to fix 'narrow frame' */
             background: linear-gradient(to bottom, #535353, #2b2b2b);
             height: 340px;
             box-shadow: 0 4px 60px rgba(0, 0, 0, 0.3);
