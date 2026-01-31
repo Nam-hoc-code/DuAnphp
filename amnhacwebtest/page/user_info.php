@@ -6,7 +6,6 @@ require_once '../partials/sidebar.php';
 
 $userId = $_SESSION['user']['user_id'] ?? null;
 if (!$userId) {
-    
     die('Chưa đăng nhập');
 }
 
@@ -45,6 +44,10 @@ $songs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <title>Tài khoản</title>
+    <!-- Import Outfit Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
@@ -54,136 +57,182 @@ $songs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         }
 
         body {
-            background: #121212;
+            background: #000;
             color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
         }
 
         .main-content {
             margin-left: 260px;
-            padding: 100px 40px 40px 40px;
+            padding: 0;
             min-height: 100vh;
-            background: linear-gradient(to bottom, #1e1e1e, #121212);
+            background: #121212;
             position: relative;
-            z-index: 1;
         }
 
+        /* Profile Header Section mimicking Image 2 */
         .profile-header {
             display: flex;
-            align-items: center;
-            gap: 30px;
-            margin-bottom: 50px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: flex-end;
+            gap: 24px;
+            padding: 80px 475px 24px; /* Reduced padding from 450px to 32px to fix 'narrow frame' */
+            background: linear-gradient(to bottom, #535353, #2b2b2b);
+            height: 340px;
+            box-shadow: 0 4px 60px rgba(0, 0, 0, 0.3);
         }
 
         .avatar {
-            width: 150px;
-            height: 150px;
+            width: 232px;
+            height: 232px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1db954 0%, #191414 100%);
+            background: #8e9e91ff; /* Grey background like Image 2 */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 70px;
-            color: #fff;
+            font-size: 80px;
+            color: #f0f7f2ff;
+            box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
             flex-shrink: 0;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
 
-        .profile-info h1 {
-            font-size: 36px;
-            font-weight: 800;
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .profile-label {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
             margin-bottom: 8px;
             color: #fff;
         }
 
-        .profile-info p {
+        .profile-info h1 {
+            font-size: 96px; /* Huge, bold typography */
+            font-weight: 900;
+            margin: 0 0 10px 0;
+            color: #fff;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .profile-stats {
             font-size: 16px;
-            color: #b3b3b3;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        /* Content Body */
+        .content-body {
+            padding: 24px 32px;
+            background: linear-gradient(to bottom, rgba(18,18,18,1) 0%, #121212 100%);
         }
 
         .section-title {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 24px;
-            margin-top: 20px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
             color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: #a020f0; /* Purple color for the music icon */
         }
 
         .empty-message {
             color: #b3b3b3;
             font-size: 16px;
             padding: 40px 0;
-            text-align: center;
+            text-align: center; /* Centered like typical modern empty states (and likely Image 2) */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .song-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 24px;
-            margin-bottom: 40px;
         }
 
         .song-card {
-            background: #282828;
-            border-radius: 8px;
+            background: #181818;
+            border-radius: 6px;
             padding: 16px;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s ease;
             cursor: pointer;
-            overflow: hidden;
         }
 
         .song-card:hover {
-            background: #333333;
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            background: #282828;
         }
 
         .song-card-image {
             width: 100%;
             aspect-ratio: 1 / 1;
             border-radius: 4px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             object-fit: cover;
-            background: #404040;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
         .song-title {
-            font-weight: 600;
-            font-size: 15px;
+            font-weight: 700;
+            font-size: 16px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             color: #fff;
-            line-height: 1.4;
+            margin-bottom: 4px;
         }
 
         @media (max-width: 1024px) {
             .main-content {
                 margin-left: 0;
-                padding: 80px 24px;
             }
-
-            .profile-header {
-                flex-direction: column;
-                text-align: center;
+             .profile-header {
+                height: auto;
+                /* Removed flex-direction: column and center alignment to keep it wide & left-aligned like desktop */
+                flex-wrap: wrap;
+                padding-left: 32px;
+                padding-right: 32px;
+                padding-bottom: 32px;
+                
             }
-
-            .song-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+             .profile-info h1 {
+                font-size: 64px;
+            }
+            .profile-info {
+                align-items: flex-start; /* Keep text left-aligned */
             }
         }
 
         @media (max-width: 768px) {
-            .song-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 16px;
+            .profile-header {
+                flex-direction: column;
+                align-items: flex-start; /* Ensure left align even when stacked */
+                padding: 40px 24px;
+            }
+            
+            .avatar {
+                width: 160px;
+                height: 160px;
+                font-size: 60px;
             }
 
-            .section-title {
-                font-size: 24px;
+            .profile-info h1 {
+                font-size: 48px;
             }
+
+          
+
+
         }
     </style>
 </head>
@@ -196,34 +245,37 @@ $songs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             <i class="fa-solid fa-user"></i>
         </div>
         <div class="profile-info">
+            <span class="profile-label">Hồ sơ</span>
             <h1><?= htmlspecialchars($user['username']) ?></h1>
-            <p><?= count($songs) ?> bài hát yêu thích</p>
+            <p class="profile-stats"><?= count($songs) ?> bài hát yêu thích</p>
         </div>
     </div>
 
-    <h2 class="section-title">🎵 Bài hát yêu thích</h2>
+    <div class="content-body">
+        <h2 class="section-title"><i class="fa-solid fa-music"></i> Bài hát yêu thích</h2>
 
-    <?php if (empty($songs)): ?>
-        <div class="empty-message">
-            <i class="fa-regular fa-heart" style="font-size: 48px; margin-bottom: 16px; display: block; opacity: 0.5;"></i>
-            <p>Chưa có bài hát yêu thích. Hãy thêm những bài hát bạn thích!</p>
-        </div>
-    <?php else: ?>
-        <div class="song-grid">
-            <?php foreach ($songs as $song): ?>
-                <div class="song-card">
-                    <img 
-                        class="song-card-image"
-                        src="<?= !empty($song['cover_image']) ? htmlspecialchars($song['cover_image']) : 'https://via.placeholder.com/180?text=No+Image' ?>" 
-                        alt="<?= htmlspecialchars($song['title']) ?>"
-                        data-fallback="https://via.placeholder.com/180?text=No+Image">
-                    <div class="song-title" title="<?= htmlspecialchars($song['title']) ?>">
-                        <?= htmlspecialchars($song['title']) ?>
+        <?php if (empty($songs)): ?>
+            <div class="empty-message">
+                <i class="fa-regular fa-heart" style="font-size: 64px; margin-bottom: 24px; opacity: 0.3;"></i>
+                <p>Chưa có bài hát yêu thích. Hãy thêm những bài hát bạn thích!</p>
+            </div>
+        <?php else: ?>
+            <div class="song-grid">
+                <?php foreach ($songs as $song): ?>
+                    <div class="song-card">
+                        <img 
+                            class="song-card-image"
+                            src="<?= !empty($song['cover_image']) ? htmlspecialchars($song['cover_image']) : 'https://via.placeholder.com/180?text=No+Image' ?>" 
+                            alt="<?= htmlspecialchars($song['title']) ?>"
+                            data-fallback="https://via.placeholder.com/180?text=No+Image">
+                        <div class="song-title" title="<?= htmlspecialchars($song['title']) ?>">
+                            <?= htmlspecialchars($song['title']) ?>
+                        </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
 </main>
 
 <?php require_once '../partials/footer.php'; ?>
