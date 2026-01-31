@@ -1,8 +1,10 @@
 <?php
 require_once '../config/database.php';
 require_once '../auth/check_login.php';
-require_once '../partials/header.php';
-require_once '../partials/sidebar.php';
+if (!isset($_GET['ajax'])) {
+    require_once '../partials/header.php';
+    require_once '../partials/sidebar.php';
+}
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -169,4 +171,8 @@ $favorites = $result->fetch_all(MYSQLI_ASSOC);
     <?php endif; ?>
 </main>
 
-<?php require_once '../partials/player.php'; ?>
+<?php 
+if (!isset($_GET['ajax'])) {
+    require_once '../partials/player.php'; 
+}
+?>
