@@ -3,11 +3,16 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once '../auth/check_login.php';
-require_once '../partials/header.php';
-require_once '../partials/sidebar.php';
+
+// Chỉ include header/sidebar nếu KHÔNG phải là request AJAX
+if (!isset($_GET['ajax'])) {
+    require_once '../partials/header.php';
+    require_once '../partials/sidebar.php';
+}
+
 require_once 'homeprocess.php';
 
-
+// ... (logic) ... 
 
 if (isset($_GET['song_id'])) {
     foreach ($songList as $song) {
@@ -410,7 +415,7 @@ background: var(--spotify-green);
             <?php
                 $cover = (!empty($song['cover_image'])) ? $song['cover_image'] : $defaultCover;
             ?>
-            <div class="song-card" onclick="window.location.href='home.php?song_id=<?= $song['song_id'] ?>'">
+            <div class="song-card" onclick="if(window.loadPage){loadPage('home.php?song_id=<?= $song['song_id'] ?>')}else{window.location.href='home.php?song_id=<?= $song['song_id'] ?>'}">
                 <div class="card-img-wrapper">
                     <img src="<?= htmlspecialchars($cover) ?>" class="card-img" alt="cover">
                     <div class="play-btn-overlay">
@@ -453,7 +458,7 @@ background: var(--spotify-green);
                 <div style="color: var(--text-sub); font-size: 13px; margin: 0 20px;">
                     <i class="fa-solid fa-chart-line" style="margin-right: 8px;"></i> Trending
                 </div>
-                <button onclick="window.location.href='home.php?song_id=<?= $song['song_id'] ?>'" 
+                <button onclick="if(window.loadPage){loadPage('home.php?song_id=<?= $song['song_id'] ?>')}else{window.location.href='home.php?song_id=<?= $song['song_id'] ?>'}" 
                         style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;">
                     <i class="fa-solid fa-play"></i>
                 </button>
@@ -492,7 +497,11 @@ background: var(--spotify-green);
    
 </main>
 
-<?php require_once '../partials/player.php'; ?>
+<?php 
+if (!isset($_GET['ajax'])) {
+    require_once '../partials/player.php'; 
+}
+?>
 
 <script>
     let currentSlide = 0;
@@ -553,7 +562,7 @@ background: var(--spotify-green);
                     icon.classList.add('fa-regular');
                 }
             } else if (data.message === 'Please login first') {
-                window.location.href = '../auth/login_form.php';
+                if(window.loadPage) loadPage('../auth/login_form.php'); else window.location.href = '../auth/login_form.php';
             } else {
                 alert(data.message);
             }

@@ -5,8 +5,10 @@ ini_set('display_errors', 1);
 try {
     require_once '../auth/check_login.php';
     require_once '../config/database.php';
-    require_once '../partials/header.php';
-    require_once '../partials/sidebar.php';
+    if (!isset($_GET['ajax'])) {
+        require_once '../partials/header.php';
+        require_once '../partials/sidebar.php';
+    }
 } catch (Exception $e) {
     die('Lỗi load file: ' . $e->getMessage());
 }
@@ -426,7 +428,7 @@ $artistAvatar = !empty($artist['avatar']) ? '../' . $artist['avatar'] : $default
             <table class="song-table">
                 <tbody>
                     <?php foreach ($songs as $index => $song): ?>
-                        <tr class="song-row" onclick="window.location.href='../user/home.php?song_id=<?= $song['song_id'] ?>'">
+                        <tr class="song-row" onclick="if(window.loadPage){loadPage('../user/home.php?song_id=<?= $song['song_id'] ?>')}else{window.location.href='../user/home.php?song_id=<?= $song['song_id'] ?>'}">
                             <td class="rank-col"><?= $index + 1 ?></td>
                             <td>
                                 <div class="title-col">
@@ -473,7 +475,11 @@ $artistAvatar = !empty($artist['avatar']) ? '../' . $artist['avatar'] : $default
 <script>
     function playFirstSong() {
         <?php if (!empty($songs)): ?>
-            window.location.href = '../user/home.php?song_id=<?= $songs[0]['song_id'] ?>';
+            if(window.loadPage) {
+                loadPage('../user/home.php?song_id=<?= $songs[0]['song_id'] ?>');
+            } else {
+                window.location.href = '../user/home.php?song_id=<?= $songs[0]['song_id'] ?>';
+            }
         <?php endif; ?>
     }
 
