@@ -249,28 +249,43 @@ include "../partials/sidebar.php";
                 <ul class="order-items">
                     <?php foreach ($cart_items as $item): ?>
                         <?php
+                        $image_file = ltrim($item['image'], '/');
+                        $image_file = str_replace(['uploads/discs/','assets/images/discs/'], '', $image_file);
+
+                        /* đường dẫn vật lý để check */
+                        $check_path = __DIR__ . '/../uploads/discs/' . $image_file;
+
+                        /* đường dẫn để hiển thị ra trình duyệt */
+                        $web_path   = '../uploads/discs/' . $image_file;
+
+                        if (!empty($image_file) && file_exists($check_path)) {
+                            $image_path = $web_path;
+                        } else {
+                            $image_path = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect fill=%22%23444%22 width=%2248%22 height=%2248%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2212%22%3ENo Image%3C/text%3E%3C/svg%3E';
+                        }
+
                             // Xây dựng đường dẫn hình ảnh từ thư mục uploads hoặc assets
-                            $image_file = $item['image'];
-                            // Kiểm tra xem file có tồn tại không
-                            $possible_paths = [
-                                '../uploads/discs/' . $image_file,
-                                '../assets/images/discs/' . $image_file,
-                                'uploads/discs/' . $image_file,
-                                'assets/images/discs/' . $image_file
-                            ];
+                            // $image_file = $item['image'];
+                            // // Kiểm tra xem file có tồn tại không
+                            // $possible_paths = [
+                            //     '../uploads/discs/' . $image_file,
+                            //     '../assets/images/discs/' . $image_file,
+                            //     'uploads/discs/' . $image_file,
+                            //     'assets/images/discs/' . $image_file
+                            // ];
                             
-                            $image_path = null;
-                            foreach ($possible_paths as $path) {
-                                if (file_exists($path)) {
-                                    $image_path = $path;
-                                    break;
-                                }
-                            }
+                            // $image_path = null;
+                            // foreach ($possible_paths as $path) {
+                            //     if (file_exists($path)) {
+                            //         $image_path = $path;
+                            //         break;
+                            //     }
+                            // }
                             
-                            // Nếu không tìm thấy, dùng placeholder đơn giản
-                            if (!$image_path) {
-                                $image_path = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect fill=%22%23444%22 width=%2248%22 height=%2248%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2212%22%3ENo Image%3C/text%3E%3C/svg%3E';
-                            }
+                            // // Nếu không tìm thấy, dùng placeholder đơn giản
+                            // if (!$image_path) {
+                            //     $image_path = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect fill=%22%23444%22 width=%2248%22 height=%2248%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2212%22%3ENo Image%3C/text%3E%3C/svg%3E';
+                            // }
                         ?>
                         <li class="order-item">
                             <img src="<?= htmlspecialchars($image_path) ?>" 

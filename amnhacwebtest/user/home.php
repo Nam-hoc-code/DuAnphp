@@ -368,7 +368,7 @@ background: var(--spotify-green);
                     <h1 class="slide-title">Mong Năm Mới Trải Hoa</h1>
                     <p class="slide-desc">Cùng thưởng thức giai điệu bắt tai và ca từ ý nghĩa.</p>
 <div class="btn-wrap">
-                        <a href="homepage?song_id=1" class="btn-play-now">Nghe ngay</a>
+                        <a href="home.php?song_id=1" class="btn-play-now">Nghe ngay</a>
                     </div>
                 </div>
             </div>
@@ -392,7 +392,7 @@ background: var(--spotify-green);
                     <h1 class="slide-title">Muộn rồi mà sao còn</h1>
                     <p class="slide-desc">Đừng để âm nhạc của bạn bị gián đoạn, hãy nghe ngay!</p>
                     <div class="btn-wrap">
-                        <a href="homepage?song_id=10" class="btn-play-now">Nghe ngay</a>
+                        <a href="home.php?song_id=10" class="btn-play-now">Nghe ngay</a>
                     </div>
                 </div>
             </div>
