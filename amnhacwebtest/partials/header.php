@@ -252,6 +252,9 @@ $keyword = $_GET['q'] ?? '';
                         <a href="../page/user_info.php" class="dropdown-item">
                             <i class="fa-solid fa-user" style="margin-right: 8px;"></i>Tài khoản
                         </a>
+                        <a href="../user/my_orders.php" class="dropdown-item">
+                            <i class="fa-solid fa-box-open" style="margin-right: 8px;"></i>Đơn hàng của tôi
+                        </a>
                         <hr class="dropdown-divider">
                         <a href="../auth/logout.php" class="dropdown-item" style="color: var(--logout-red);">
                             <i class="fa-solid fa-sign-out-alt" style="margin-right: 8px;"></i>Đăng xuất
